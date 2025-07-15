@@ -648,12 +648,6 @@
                                 <canvas id="velocityChart" class="simple-chart"></canvas>
                             </div>
                         </div>
-                        <div class="card chart-card">
-                            <h3>Pressure Chart</h3>
-                            <div class="chart-container">
-                                <canvas id="pressureChart" class="simple-chart"></canvas>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -876,11 +870,11 @@
             const maxVal = Math.max(...validData);
             const minVal = Math.min(...validData);
             const range = maxVal - minVal;
-            const normalizedRange = range || 1;
+            const normalizedRange = Math.max(range, maxVal * 0.2) || 1; // Ensure minimum range
             
-            // Add 10% padding to top and bottom
-            const paddedMax = maxVal + (normalizedRange * 0.1);
-            const paddedMin = minVal - (normalizedRange * 0.1);
+            // Add 30% padding to top and bottom for better zoom out
+            const paddedMax = maxVal + (normalizedRange * 0.3);
+            const paddedMin = minVal - (normalizedRange * 0.3);
             const paddedRange = paddedMax - paddedMin;
             
             // Draw area fill with gradient
@@ -1312,7 +1306,6 @@
             
             // Dashboard charts
             drawSimpleChart('velocityChart', velocityData, 'Velocity (m/s)', '#3498db');
-            drawSimpleChart('pressureChart', diffPressureData, 'Diff Pressure (Pa)', '#e74c3c');
             
             // Graphs tab charts
             drawSimpleChart('velocityChart2', velocityData, 'Velocity (m/s)', '#3498db');
