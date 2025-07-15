@@ -6,6 +6,7 @@
     <title>Wind Tunnel Data Acquisition System</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -349,6 +350,18 @@
             background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
             position: relative;
             box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Plotly Chart Styling */
+        .plotly-chart {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background: transparent;
+        }
+
+        .plotly-chart .plotly {
+            border-radius: 8px;
         }
 
         /* Tunnel Image */
@@ -723,7 +736,7 @@
                         <div class="card chart-card">
                             <h3>Velocity Chart</h3>
                             <div class="chart-container">
-                                <canvas id="velocityChart" class="simple-chart"></canvas>
+                                <div id="velocityChart" class="plotly-chart"></div>
                             </div>
                         </div>
                     </div>
@@ -750,25 +763,25 @@
                     <div class="card">
                         <h3>Velocity Over Time</h3>
                         <div class="chart-container">
-                            <canvas id="velocityChart2" class="simple-chart"></canvas>
+                            <div id="velocityChart2" class="plotly-chart"></div>
                         </div>
                     </div>
                     <div class="card">
                         <h3>Flow Rate Over Time</h3>
                         <div class="chart-container">
-                            <canvas id="flowRateChart" class="simple-chart"></canvas>
+                            <div id="flowRateChart" class="plotly-chart"></div>
                         </div>
                     </div>
                     <div class="card">
                         <h3>Pressure Comparison</h3>
                         <div class="chart-container">
-                            <canvas id="pressureChart2" class="simple-chart"></canvas>
+                            <div id="pressureChart2" class="plotly-chart"></div>
                         </div>
                     </div>
                     <div class="card">
                         <h3>Fan Speed & Power</h3>
                         <div class="chart-container">
-                            <canvas id="fanPowerChart" class="simple-chart"></canvas>
+                            <div id="fanPowerChart" class="plotly-chart"></div>
                         </div>
                     </div>
                 </div>
@@ -960,289 +973,147 @@
             }
         }
 
-        // Professional chart implementation
-        function drawSimpleChart(canvasId, data, label, color) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) {
-                console.log('Canvas not found:', canvasId);
+        // Professional Plotly chart implementation
+        function drawSimpleChart(containerId, data, label, color) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.log('Container not found:', containerId);
                 return;
             }
-            
-            const ctx = canvas.getContext('2d');
-            
-            // Set canvas size to match display size
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Check if we have data
             if (!data || data.length === 0) {
-                drawEmptyChart(ctx, canvas.width, canvas.height, label);
+                drawEmptyChart(container, label);
                 return;
             }
-            
-            // Calculate chart area
-            const padding = 50;
-            const chartWidth = canvas.width - 2 * padding;
-            const chartHeight = canvas.height - 2 * padding;
-            
-            // Draw background with gradient
-            const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            bgGradient.addColorStop(0, '#2c3e50');
-            bgGradient.addColorStop(1, '#1a252f');
-            ctx.fillStyle = bgGradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw chart background with subtle gradient
-            const chartGradient = ctx.createLinearGradient(0, padding, 0, padding + chartHeight);
-            chartGradient.addColorStop(0, '#1e2a35');
-            chartGradient.addColorStop(1, '#16212b');
-            ctx.fillStyle = chartGradient;
-            ctx.fillRect(padding, padding, chartWidth, chartHeight);
-            
-            // Draw border with shadow effect
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = 10;
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
-            ctx.strokeStyle = '#555';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(padding, padding, chartWidth, chartHeight);
-            
-            // Reset shadow
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-            
-            // Draw professional grid
-            drawProfessionalGrid(ctx, padding, chartWidth, chartHeight);
             
             // Filter out invalid data
             const validData = data.filter(d => !isNaN(d) && d !== null && d !== undefined);
             
             if (validData.length === 0) {
-                drawEmptyChart(ctx, canvas.width, canvas.height, label);
+                drawEmptyChart(container, label);
                 return;
             }
             
-            // Calculate min/max values with some padding
-            const maxVal = Math.max(...validData);
-            const minVal = Math.min(...validData);
-            const range = maxVal - minVal;
-            const normalizedRange = Math.max(range, maxVal * 0.2) || 1; // Ensure minimum range
-            
-            // Add 30% padding to top and bottom for better zoom out
-            const paddedMax = maxVal + (normalizedRange * 0.3);
-            const paddedMin = minVal - (normalizedRange * 0.3);
-            const paddedRange = paddedMax - paddedMin;
-            
-            // Draw area fill with gradient
-            if (validData.length > 1) {
-                drawAreaFill(ctx, validData, padding, chartWidth, chartHeight, paddedMin, paddedRange, color);
-            }
-            
-            // Draw main data line with glow effect
-            if (validData.length > 1) {
-                drawGlowLine(ctx, validData, padding, chartWidth, chartHeight, paddedMin, paddedRange, color);
-            }
-            
-            // Draw enhanced data points
-            drawEnhancedPoints(ctx, validData, padding, chartWidth, chartHeight, paddedMin, paddedRange, color);
-            
-            // Draw professional labels and values
-            drawProfessionalLabels(ctx, canvas.width, canvas.height, padding, chartWidth, chartHeight, 
-                                 paddedMin, paddedMax, validData, color, label);
-        }
-
-        function drawEmptyChart(ctx, width, height, label) {
-            // Background gradient
-            const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
-            bgGradient.addColorStop(0, '#2c3e50');
-            bgGradient.addColorStop(1, '#1a252f');
-            ctx.fillStyle = bgGradient;
-            ctx.fillRect(0, 0, width, height);
-            
-            // Empty state message
-            ctx.fillStyle = '#7f8c8d';
-            ctx.font = 'bold 18px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('⚡ Waiting for data...', width / 2, height / 2 - 10);
-            
-            // Label
-            ctx.fillStyle = '#bdc3c7';
-            ctx.font = '16px Arial';
-            ctx.fillText(label, width / 2, height / 2 + 20);
-        }
-
-        function drawProfessionalGrid(ctx, padding, chartWidth, chartHeight) {
-            // Grid lines with subtle glow
-            ctx.strokeStyle = '#34495e';
-            ctx.lineWidth = 1;
-            ctx.shadowColor = 'rgba(52, 152, 219, 0.3)';
-            ctx.shadowBlur = 2;
-            
-            // Vertical grid lines
-            for (let i = 1; i < 6; i++) {
-                const x = padding + (i * chartWidth / 6);
-                ctx.beginPath();
-                ctx.moveTo(x, padding);
-                ctx.lineTo(x, padding + chartHeight);
-                ctx.stroke();
-            }
-            
-            // Horizontal grid lines
-            for (let i = 1; i < 5; i++) {
-                const y = padding + (i * chartHeight / 5);
-                ctx.beginPath();
-                ctx.moveTo(padding, y);
-                ctx.lineTo(padding + chartWidth, y);
-                ctx.stroke();
-            }
-            
-            // Reset shadow
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
-        }
-
-        function drawAreaFill(ctx, data, padding, chartWidth, chartHeight, minVal, range, color) {
-            // Create gradient for area fill
-            const areaGradient = ctx.createLinearGradient(0, padding, 0, padding + chartHeight);
-            areaGradient.addColorStop(0, color + '60'); // 60% opacity
-            areaGradient.addColorStop(1, color + '10'); // 10% opacity
-            
-            ctx.fillStyle = areaGradient;
-            ctx.beginPath();
-            
-            // Start from bottom left
-            ctx.moveTo(padding, padding + chartHeight);
-            
-            // Draw to first point
-            const firstY = padding + chartHeight - ((data[0] - minVal) / range) * chartHeight;
-            ctx.lineTo(padding, firstY);
-            
-            // Draw line through all points
-            data.forEach((value, index) => {
-                const x = padding + (index / (data.length - 1)) * chartWidth;
-                const y = padding + chartHeight - ((value - minVal) / range) * chartHeight;
-                ctx.lineTo(x, y);
+            // Create time series x-axis
+            const timeLabels = validData.map((_, index) => {
+                const now = new Date();
+                const time = new Date(now.getTime() - (validData.length - index - 1) * 1000);
+                return time.toLocaleTimeString();
             });
             
-            // Close the path back to bottom
-            ctx.lineTo(padding + chartWidth, padding + chartHeight);
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        function drawGlowLine(ctx, data, padding, chartWidth, chartHeight, minVal, range, color) {
-            // Draw glow effect (multiple passes)
-            for (let i = 0; i < 3; i++) {
-                ctx.strokeStyle = color + (i === 0 ? '80' : i === 1 ? '60' : '40');
-                ctx.lineWidth = 5 - i;
-                ctx.shadowColor = color;
-                ctx.shadowBlur = 8 - i * 2;
-                
-                ctx.beginPath();
-                data.forEach((value, index) => {
-                    const x = padding + (index / (data.length - 1)) * chartWidth;
-                    const y = padding + chartHeight - ((value - minVal) / range) * chartHeight;
-                    
-                    if (index === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
+            // Create trace
+            const trace = {
+                x: timeLabels,
+                y: validData,
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {
+                    color: color,
+                    width: 3,
+                    shape: 'spline'
+                },
+                marker: {
+                    color: color,
+                    size: 6,
+                    line: {
+                        color: '#ffffff',
+                        width: 1
                     }
-                });
-                ctx.stroke();
-            }
+                },
+                fill: 'tonexty',
+                fillcolor: color + '20',
+                name: label,
+                hovertemplate: '<b>%{fullData.name}</b><br>' +
+                              'Time: %{x}<br>' +
+                              'Value: %{y}<br>' +
+                              '<extra></extra>'
+            };
             
-            // Reset shadow
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
+            // Layout configuration
+            const layout = {
+                title: {
+                    text: label,
+                    font: {
+                        color: '#ecf0f1',
+                        size: 16
+                    }
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: {
+                    color: '#ecf0f1'
+                },
+                xaxis: {
+                    title: 'Time',
+                    titlefont: {
+                        color: '#bdc3c7'
+                    },
+                    tickfont: {
+                        color: '#95a5a6'
+                    },
+                    gridcolor: '#34495e',
+                    zerolinecolor: '#34495e',
+                    showgrid: true,
+                    zeroline: false
+                },
+                yaxis: {
+                    title: label,
+                    titlefont: {
+                        color: '#bdc3c7'
+                    },
+                    tickfont: {
+                        color: '#95a5a6'
+                    },
+                    gridcolor: '#34495e',
+                    zerolinecolor: '#34495e',
+                    showgrid: true,
+                    zeroline: false
+                },
+                margin: {
+                    l: 60,
+                    r: 20,
+                    t: 40,
+                    b: 50
+                },
+                showlegend: false,
+                hovermode: 'closest'
+            };
+            
+            // Configuration
+            const config = {
+                responsive: true,
+                displayModeBar: false,
+                doubleClick: false,
+                showTips: false
+            };
+            
+            // Create the plot
+            Plotly.newPlot(containerId, [trace], layout, config);
+            
+            // Apply zoom after plot is created
+            setTimeout(() => {
+                applyChartZoom();
+            }, 100);
         }
 
-        function drawEnhancedPoints(ctx, data, padding, chartWidth, chartHeight, minVal, range, color) {
-            data.forEach((value, index) => {
-                const x = padding + (index / (data.length - 1)) * chartWidth;
-                const y = padding + chartHeight - ((value - minVal) / range) * chartHeight;
-                
-                // Outer glow
-                ctx.beginPath();
-                ctx.arc(x, y, 8, 0, Math.PI * 2);
-                ctx.fillStyle = color + '30';
-                ctx.fill();
-                
-                // Inner circle
-                ctx.beginPath();
-                ctx.arc(x, y, 5, 0, Math.PI * 2);
-                ctx.fillStyle = color;
-                ctx.fill();
-                
-                // Center highlight
-                ctx.beginPath();
-                ctx.arc(x, y, 2, 0, Math.PI * 2);
-                ctx.fillStyle = '#ffffff';
-                ctx.fill();
-            });
-        }
-
-        function drawProfessionalLabels(ctx, width, height, padding, chartWidth, chartHeight, 
-                                      minVal, maxVal, data, color, label) {
-            // Value labels with background
-            ctx.font = 'bold 12px Arial';
-            
-            // Min value
-            drawLabelWithBackground(ctx, minVal.toFixed(1), padding + 10, padding + chartHeight - 10, '#e74c3c');
-            
-            // Max value
-            drawLabelWithBackground(ctx, maxVal.toFixed(1), padding + 10, padding + 20, '#27ae60');
-            
-            // Current value (larger and more prominent)
-            if (data.length > 0) {
-                const currentValue = data[data.length - 1];
-                ctx.font = 'bold 16px Arial';
-                drawLabelWithBackground(ctx, currentValue.toFixed(1), width - padding - 10, padding + 25, color, 'right');
-            }
-            
-            // Chart title with glow
-            ctx.font = 'bold 16px Arial';
-            ctx.fillStyle = '#ecf0f1';
-            ctx.textAlign = 'center';
-            ctx.shadowColor = color;
-            ctx.shadowBlur = 5;
-            ctx.fillText(label, width / 2, height - 15);
-            
-            // Reset shadow
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
-        }
-
-        function drawLabelWithBackground(ctx, text, x, y, color, align = 'left') {
-            ctx.textAlign = align;
-            
-            // Measure text
-            const metrics = ctx.measureText(text);
-            const textWidth = metrics.width;
-            const textHeight = 16;
-            
-            // Calculate background position
-            let bgX = x - 5;
-            if (align === 'right') {
-                bgX = x - textWidth - 5;
-            } else if (align === 'center') {
-                bgX = x - textWidth / 2 - 5;
-            }
-            
-            // Draw background
-            ctx.fillStyle = color + '40';
-            ctx.fillRect(bgX, y - textHeight + 3, textWidth + 10, textHeight);
-            
-            // Draw text
-            ctx.fillStyle = '#ecf0f1';
-            ctx.fillText(text, x, y);
+        function drawEmptyChart(container, label) {
+            container.innerHTML = `
+                <div style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                    color: #7f8c8d;
+                    font-size: 16px;
+                    font-weight: 600;
+                ">
+                    <div style="font-size: 24px; margin-bottom: 10px;">⚡</div>
+                    <div>Waiting for data...</div>
+                    <div style="font-size: 14px; color: #bdc3c7; margin-top: 5px;">${label}</div>
+                </div>
+            `;
         }
 
         // Tab switching
