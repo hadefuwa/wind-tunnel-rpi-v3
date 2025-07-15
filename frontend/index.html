@@ -13,12 +13,29 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a1a;
-            color: #e0e0e0;
+            background: linear-gradient(135deg, #0f1419 0%, #1a252f 50%, #2c3e50 100%);
+            background-attachment: fixed;
+            color: #ecf0f1;
             height: 100vh;
             overflow: hidden;
             margin: 0;
             padding: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(46, 204, 113, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(231, 76, 60, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .container {
@@ -180,40 +197,67 @@
             flex-shrink: 0;
         }
 
-        /* Metrics Grid */
+        /* Enhanced Metrics Grid */
         .metrics {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 15px;
         }
 
         .metric {
-            background: #333;
-            padding: 12px;
-            border-radius: 6px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            padding: 16px;
+            border-radius: 12px;
             text-align: center;
-            border: 1px solid #555;
-            transition: transform 0.3s ease;
+            border: 1px solid #4a5568;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #f39c12);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .metric:hover::before {
+            opacity: 1;
         }
 
         .metric:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(52, 152, 219, 0.4);
         }
 
         .metric-value {
-            font-size: 1.4em;
-            font-weight: bold;
+            font-size: 1.6em;
+            font-weight: 700;
             color: #3498db;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: color 0.3s ease;
+        }
+
+        .metric:hover .metric-value {
+            color: #2ecc71;
         }
 
         .metric-label {
-            font-size: 0.7em;
-            opacity: 0.8;
+            font-size: 0.75em;
+            opacity: 0.9;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: #bdc3c7;
         }
 
         /* Controls */
@@ -266,33 +310,43 @@
             transform: translateY(-1px);
         }
 
-        /* Chart Container */
+        /* Enhanced Chart Container */
         .chart-container {
             position: relative;
-            height: 200px;
-            background: #333;
-            border-radius: 6px;
-            padding: 10px;
+            height: 260px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            border-radius: 12px;
+            padding: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex: 1;
             overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
 
         .chart-placeholder {
-            color: #666;
-            font-size: 14px;
+            color: #7f8c8d;
+            font-size: 16px;
             text-align: center;
+            font-weight: 600;
         }
 
-        /* Simple Chart */
+        /* Enhanced Chart Canvas */
         .simple-chart {
             width: 100%;
             height: 100%;
-            border: 2px solid #555;
-            background: #1a1a1a;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
             position: relative;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         /* Tunnel Image */
@@ -595,7 +649,7 @@
 
             <!-- Graphs Tab -->
             <div id="graphs" class="tab-content">
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; height: 100%; overflow: hidden;">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; height: 100%; overflow: hidden;">
                     <div class="card">
                         <h3>Velocity Over Time</h3>
                         <div class="chart-container">
@@ -618,18 +672,6 @@
                         <h3>Fan Speed & Power</h3>
                         <div class="chart-container">
                             <canvas id="fanPowerChart" class="simple-chart"></canvas>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <h3>Valve Position</h3>
-                        <div class="chart-container">
-                            <canvas id="valveChart" class="simple-chart"></canvas>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <h3>Drag Force</h3>
-                        <div class="chart-container">
-                            <canvas id="dragChart" class="simple-chart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -704,7 +746,7 @@
         let charts = {};
         let connectionStatus = false;
 
-        // Simple chart implementation
+        // Professional chart implementation
         function drawSimpleChart(canvasId, data, label, color) {
             const canvas = document.getElementById(canvasId);
             if (!canvas) {
@@ -724,10 +766,7 @@
             
             // Check if we have data
             if (!data || data.length === 0) {
-                ctx.fillStyle = '#666';
-                ctx.font = '16px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('Waiting for data...', canvas.width / 2, canvas.height / 2);
+                drawEmptyChart(ctx, canvas.width, canvas.height, label);
                 return;
             }
             
@@ -736,26 +775,105 @@
             const chartWidth = canvas.width - 2 * padding;
             const chartHeight = canvas.height - 2 * padding;
             
-            // Draw background
-            ctx.fillStyle = '#2a2a2a';
+            // Draw background with gradient
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, '#2c3e50');
+            bgGradient.addColorStop(1, '#1a252f');
+            ctx.fillStyle = bgGradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Draw chart background
-            ctx.fillStyle = '#1a1a1a';
+            // Draw chart background with subtle gradient
+            const chartGradient = ctx.createLinearGradient(0, padding, 0, padding + chartHeight);
+            chartGradient.addColorStop(0, '#1e2a35');
+            chartGradient.addColorStop(1, '#16212b');
+            ctx.fillStyle = chartGradient;
             ctx.fillRect(padding, padding, chartWidth, chartHeight);
             
-            // Draw border
+            // Draw border with shadow effect
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
             ctx.strokeStyle = '#555';
             ctx.lineWidth = 2;
             ctx.strokeRect(padding, padding, chartWidth, chartHeight);
             
-            // Draw grid lines
-            ctx.strokeStyle = '#333';
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // Draw professional grid
+            drawProfessionalGrid(ctx, padding, chartWidth, chartHeight);
+            
+            // Filter out invalid data
+            const validData = data.filter(d => !isNaN(d) && d !== null && d !== undefined);
+            
+            if (validData.length === 0) {
+                drawEmptyChart(ctx, canvas.width, canvas.height, label);
+                return;
+            }
+            
+            // Calculate min/max values with some padding
+            const maxVal = Math.max(...validData);
+            const minVal = Math.min(...validData);
+            const range = maxVal - minVal;
+            const normalizedRange = range || 1;
+            
+            // Add 10% padding to top and bottom
+            const paddedMax = maxVal + (normalizedRange * 0.1);
+            const paddedMin = minVal - (normalizedRange * 0.1);
+            const paddedRange = paddedMax - paddedMin;
+            
+            // Draw area fill with gradient
+            if (validData.length > 1) {
+                drawAreaFill(ctx, validData, padding, chartWidth, chartHeight, paddedMin, paddedRange, color);
+            }
+            
+            // Draw main data line with glow effect
+            if (validData.length > 1) {
+                drawGlowLine(ctx, validData, padding, chartWidth, chartHeight, paddedMin, paddedRange, color);
+            }
+            
+            // Draw enhanced data points
+            drawEnhancedPoints(ctx, validData, padding, chartWidth, chartHeight, paddedMin, paddedRange, color);
+            
+            // Draw professional labels and values
+            drawProfessionalLabels(ctx, canvas.width, canvas.height, padding, chartWidth, chartHeight, 
+                                 paddedMin, paddedMax, validData, color, label);
+        }
+
+        function drawEmptyChart(ctx, width, height, label) {
+            // Background gradient
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+            bgGradient.addColorStop(0, '#2c3e50');
+            bgGradient.addColorStop(1, '#1a252f');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Empty state message
+            ctx.fillStyle = '#7f8c8d';
+            ctx.font = 'bold 18px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('⚡ Waiting for data...', width / 2, height / 2 - 10);
+            
+            // Label
+            ctx.fillStyle = '#bdc3c7';
+            ctx.font = '16px Arial';
+            ctx.fillText(label, width / 2, height / 2 + 20);
+        }
+
+        function drawProfessionalGrid(ctx, padding, chartWidth, chartHeight) {
+            // Grid lines with subtle glow
+            ctx.strokeStyle = '#34495e';
             ctx.lineWidth = 1;
+            ctx.shadowColor = 'rgba(52, 152, 219, 0.3)';
+            ctx.shadowBlur = 2;
             
             // Vertical grid lines
-            for (let i = 1; i < 5; i++) {
-                const x = padding + (i * chartWidth / 5);
+            for (let i = 1; i < 6; i++) {
+                const x = padding + (i * chartWidth / 6);
                 ctx.beginPath();
                 ctx.moveTo(x, padding);
                 ctx.lineTo(x, padding + chartHeight);
@@ -763,42 +881,60 @@
             }
             
             // Horizontal grid lines
-            for (let i = 1; i < 4; i++) {
-                const y = padding + (i * chartHeight / 4);
+            for (let i = 1; i < 5; i++) {
+                const y = padding + (i * chartHeight / 5);
                 ctx.beginPath();
                 ctx.moveTo(padding, y);
                 ctx.lineTo(padding + chartWidth, y);
                 ctx.stroke();
             }
             
-            // Filter out invalid data
-            const validData = data.filter(d => !isNaN(d) && d !== null && d !== undefined);
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+        }
+
+        function drawAreaFill(ctx, data, padding, chartWidth, chartHeight, minVal, range, color) {
+            // Create gradient for area fill
+            const areaGradient = ctx.createLinearGradient(0, padding, 0, padding + chartHeight);
+            areaGradient.addColorStop(0, color + '60'); // 60% opacity
+            areaGradient.addColorStop(1, color + '10'); // 10% opacity
             
-            if (validData.length === 0) {
-                ctx.fillStyle = '#666';
-                ctx.font = '16px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('No valid data', canvas.width / 2, canvas.height / 2);
-                return;
-            }
+            ctx.fillStyle = areaGradient;
+            ctx.beginPath();
             
-            // Calculate min/max values
-            const maxVal = Math.max(...validData);
-            const minVal = Math.min(...validData);
-            const range = maxVal - minVal;
+            // Start from bottom left
+            ctx.moveTo(padding, padding + chartHeight);
             
-            // Handle case where all values are the same
-            const normalizedRange = range || 1;
+            // Draw to first point
+            const firstY = padding + chartHeight - ((data[0] - minVal) / range) * chartHeight;
+            ctx.lineTo(padding, firstY);
             
-            // Draw data line
-            if (validData.length > 1) {
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 3;
-                ctx.beginPath();
+            // Draw line through all points
+            data.forEach((value, index) => {
+                const x = padding + (index / (data.length - 1)) * chartWidth;
+                const y = padding + chartHeight - ((value - minVal) / range) * chartHeight;
+                ctx.lineTo(x, y);
+            });
+            
+            // Close the path back to bottom
+            ctx.lineTo(padding + chartWidth, padding + chartHeight);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawGlowLine(ctx, data, padding, chartWidth, chartHeight, minVal, range, color) {
+            // Draw glow effect (multiple passes)
+            for (let i = 0; i < 3; i++) {
+                ctx.strokeStyle = color + (i === 0 ? '80' : i === 1 ? '60' : '40');
+                ctx.lineWidth = 5 - i;
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 8 - i * 2;
                 
-                validData.forEach((value, index) => {
-                    const x = padding + (index / (validData.length - 1)) * chartWidth;
-                    const y = padding + chartHeight - ((value - minVal) / normalizedRange) * chartHeight;
+                ctx.beginPath();
+                data.forEach((value, index) => {
+                    const x = padding + (index / (data.length - 1)) * chartWidth;
+                    const y = padding + chartHeight - ((value - minVal) / range) * chartHeight;
                     
                     if (index === 0) {
                         ctx.moveTo(x, y);
@@ -806,46 +942,93 @@
                         ctx.lineTo(x, y);
                     }
                 });
-                
                 ctx.stroke();
-                
-                // Draw data points
-                ctx.fillStyle = color;
-                validData.forEach((value, index) => {
-                    const x = padding + (index / (validData.length - 1)) * chartWidth;
-                    const y = padding + chartHeight - ((value - minVal) / normalizedRange) * chartHeight;
-                    
-                    ctx.beginPath();
-                    ctx.arc(x, y, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                });
             }
             
-            // Draw value labels
-            ctx.fillStyle = '#b0b0b0';
-            ctx.font = '12px Arial';
-            ctx.textAlign = 'left';
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+        }
+
+        function drawEnhancedPoints(ctx, data, padding, chartWidth, chartHeight, minVal, range, color) {
+            data.forEach((value, index) => {
+                const x = padding + (index / (data.length - 1)) * chartWidth;
+                const y = padding + chartHeight - ((value - minVal) / range) * chartHeight;
+                
+                // Outer glow
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = color + '30';
+                ctx.fill();
+                
+                // Inner circle
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                
+                // Center highlight
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+            });
+        }
+
+        function drawProfessionalLabels(ctx, width, height, padding, chartWidth, chartHeight, 
+                                      minVal, maxVal, data, color, label) {
+            // Value labels with background
+            ctx.font = 'bold 12px Arial';
             
             // Min value
-            ctx.fillText(minVal.toFixed(1), padding + 5, padding + chartHeight - 5);
+            drawLabelWithBackground(ctx, minVal.toFixed(1), padding + 10, padding + chartHeight - 10, '#e74c3c');
             
             // Max value
-            ctx.fillText(maxVal.toFixed(1), padding + 5, padding + 15);
+            drawLabelWithBackground(ctx, maxVal.toFixed(1), padding + 10, padding + 20, '#27ae60');
             
-            // Current value
-            if (validData.length > 0) {
-                const currentValue = validData[validData.length - 1];
-                ctx.fillStyle = color;
-                ctx.font = '14px Arial';
-                ctx.textAlign = 'right';
-                ctx.fillText(currentValue.toFixed(1), canvas.width - padding - 5, padding + 15);
+            // Current value (larger and more prominent)
+            if (data.length > 0) {
+                const currentValue = data[data.length - 1];
+                ctx.font = 'bold 16px Arial';
+                drawLabelWithBackground(ctx, currentValue.toFixed(1), width - padding - 10, padding + 25, color, 'right');
             }
             
-            // Draw label
-            ctx.fillStyle = '#b0b0b0';
-            ctx.font = '14px Arial';
+            // Chart title with glow
+            ctx.font = 'bold 16px Arial';
+            ctx.fillStyle = '#ecf0f1';
             ctx.textAlign = 'center';
-            ctx.fillText(label, canvas.width / 2, canvas.height - 15);
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 5;
+            ctx.fillText(label, width / 2, height - 15);
+            
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+        }
+
+        function drawLabelWithBackground(ctx, text, x, y, color, align = 'left') {
+            ctx.textAlign = align;
+            
+            // Measure text
+            const metrics = ctx.measureText(text);
+            const textWidth = metrics.width;
+            const textHeight = 16;
+            
+            // Calculate background position
+            let bgX = x - 5;
+            if (align === 'right') {
+                bgX = x - textWidth - 5;
+            } else if (align === 'center') {
+                bgX = x - textWidth / 2 - 5;
+            }
+            
+            // Draw background
+            ctx.fillStyle = color + '40';
+            ctx.fillRect(bgX, y - textHeight + 3, textWidth + 10, textHeight);
+            
+            // Draw text
+            ctx.fillStyle = '#ecf0f1';
+            ctx.fillText(text, x, y);
         }
 
         // Tab switching
@@ -1047,8 +1230,6 @@
             drawSimpleChart('flowRateChart', flowRateData, 'Flow Rate (l/min)', '#2ecc71');
             drawSimpleChart('pressureChart2', diffPressureData, 'Diff Pressure (Pa)', '#e74c3c');
             drawSimpleChart('fanPowerChart', fanSpeedData, 'Fan Speed (RPM)', '#f39c12');
-            drawSimpleChart('valveChart', valveData, 'Valve Position (%)', '#9b59b6');
-            drawSimpleChart('dragChart', dragData, 'Drag Force (N)', '#e67e22');
             
             // Debug logging
             console.log('Chart data updated:', {
