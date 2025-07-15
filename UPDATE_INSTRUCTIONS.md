@@ -15,11 +15,11 @@ This document provides step-by-step instructions for updating your Wind Tunnel D
 
 ```bash
 # SSH into your Raspberry Pi
-ssh pi@[YOUR_PI_IP_ADDRESS]
-# Example: ssh pi@192.168.1.100
+ssh matrix@192.168.0.117
+# Password: matrix123
 
 # Or use the hostname if configured
-ssh pi@raspberrypi.local
+ssh matrix@raspberrypi.local
 ```
 
 ### Step 2: Navigate to Project Directory
@@ -30,7 +30,7 @@ cd ~/wind-tunnel-rpi-v3
 
 # Verify you're in the right directory
 pwd
-# Should show: /home/pi/wind-tunnel-rpi-v3
+# Should show: /home/matrix/wind-tunnel-rpi-v3
 ```
 
 ### Step 3: Stop Any Running Services
