@@ -12,13 +12,14 @@ echo Adding all files...
 git add .
 
 echo Committing changes...
-git commit -m "Update: Git workflow setup and touchscreen scrolling fix
+git commit -m "Fix: Touchscreen text selection and Chrome extension errors
 
-- Added git-pull-update.sh for Pi updates
-- Enhanced touchscreen scrolling support
-- Updated web app with touch-friendly CSS
-- Created comprehensive Git workflow documentation
-- Added auto-update capabilities for Pi"
+- Added advanced touchscreen fix to prevent text selection
+- Updated web app CSS to disable user-select on touch
+- Added error handling for Chrome extension conflicts
+- Improved touch scrolling behavior
+- Added quick fix script for immediate application
+- Enhanced JavaScript error handling"
 
 echo Setting main branch...
 git branch -M main

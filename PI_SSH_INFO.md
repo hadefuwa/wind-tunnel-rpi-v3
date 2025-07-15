@@ -10,23 +10,22 @@
 ssh matrix@192.168.0.117
 ```
 
-## Quick Demo Setup Commands (for tomorrow)
+## Quick Demo Setup Commands (Updated)
 ```bash
 # 1. Connect to Pi
 ssh matrix@192.168.0.117
 
-# 2. Clone repository (if not already done)
-git clone https://github.com/hadefuwa/wind-tunnel-rpi-v3.git
+# 2. Navigate to project (already cloned and updated)
 cd wind-tunnel-rpi-v3
 
-# 3. Navigate to backend directory
-cd wind-tunnel-demo/backend
+# 3. Pull latest updates
+./git-pull-update.sh
 
-# 4. Install dependencies
-pip3 install -r requirements.txt
+# 4. Fix touchscreen scrolling
+./touchscreen-setup.sh
 
-# 5. Start demo
-python3 app.py
+# 5. Start demo with touchscreen support
+./start-touchscreen-demo.sh
 ```
 
 ## Demo Access URLs
