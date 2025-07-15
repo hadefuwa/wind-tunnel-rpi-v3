@@ -81,7 +81,7 @@ data_thread.start()
 @app.route('/')
 def index():
     """Serve the demo frontend"""
-    return render_template_string(open('../frontend/index.html').read())
+    return render_template_string(open('frontend/index.html').read())
 
 @app.route('/api/start', methods=['POST'])
 def start_collection():
