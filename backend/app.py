@@ -108,6 +108,19 @@ def serve_logo():
     frontend_dir = os.path.join(script_dir, '..', 'frontend')
     return send_from_directory(frontend_dir, 'logo.png')
 
+@app.route('/tunnel.png')
+def serve_tunnel():
+    """Serve the tunnel image file"""
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    frontend_dir = os.path.join(script_dir, '..', 'frontend')
+    return send_from_directory(frontend_dir, 'tunnel.png')
+
+@app.route('/favicon.ico')
+def serve_favicon():
+    """Serve favicon (or return 404)"""
+    return '', 404
+
 @app.route('/api/start', methods=['POST'])
 def start_collection():
     """Start data collection"""
