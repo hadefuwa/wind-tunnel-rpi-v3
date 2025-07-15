@@ -48,56 +48,6 @@
             background: #1a1a1a;
         }
 
-        /* Navigation Menu */
-        .nav-menu {
-            display: flex;
-            background: #2a2a2a;
-            border: 1px solid #333;
-            margin-bottom: 10px;
-            flex-shrink: 0;
-            height: 50px;
-        }
-
-        .nav-item {
-            flex: 1;
-            background: #333;
-            color: #e0e0e0;
-            border: none;
-            padding: 12px 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border-right: 1px solid #555;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-        }
-
-        .nav-item:last-child {
-            border-right: none;
-        }
-
-        .nav-item:hover {
-            background: #444;
-        }
-
-        .nav-item.active {
-            background: #0078d4;
-            color: white;
-        }
-
-        /* Page Content */
-        .page {
-            display: none;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .page.active {
-            display: flex;
-            flex-direction: column;
-        }
-
         .header {
             text-align: center;
             color: #ffffff;
@@ -246,7 +196,33 @@
             width: 100%;
             height: 100%;
             border: 1px solid #555;
-            background: #333;
+            background: #1a1a1a;
+        }
+
+        .simulation-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .simulation-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .simulation-overlay {
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            color: #0078d4;
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 0 0 3px rgba(0, 120, 212, 0.5);
+            z-index: 10;
         }
 
         .status {
@@ -360,7 +336,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="logo.png" alt="Company Logo" class="logo">
+            <img src="logo.png" alt="Matrix Logo" class="logo">
             <div class="header-content">
                 <h1>Wind Tunnel Data Acquisition</h1>
                 <p>Real-time Airflow Analysis & Visualization</p>
@@ -371,163 +347,53 @@
             System Ready
         </div>
 
-        <!-- Navigation Menu -->
-        <div class="nav-menu">
-            <button class="nav-item active" onclick="showPage('dashboard')">Dashboard</button>
-            <button class="nav-item" onclick="showPage('simulation')">2D Simulation</button>
-            <button class="nav-item" onclick="showPage('graphs')">Graphs</button>
-            <button class="nav-item" onclick="showPage('settings')">Settings</button>
+        <div class="controls">
+            <button class="btn btn-start" onclick="startCollection()">Start Collection</button>
+            <button class="btn btn-stop" onclick="stopCollection()">Stop Collection</button>
+            <button class="btn btn-mode" onclick="toggleMode()">Mode: <span id="mode-display">Simulation</span></button>
         </div>
 
-        <!-- Dashboard Page -->
-        <div id="dashboard" class="page active">
-            <div class="controls">
-                <button class="btn btn-start" onclick="startCollection()">Start Collection</button>
-                <button class="btn btn-stop" onclick="stopCollection()">Stop Collection</button>
-                <button class="btn btn-mode" onclick="toggleMode()">Mode: <span id="mode-display">Simulation</span></button>
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value" id="velocity-display">0.0</div>
+                <div class="metric-label">Velocity (m/s)</div>
             </div>
-
-            <div class="metrics">
-                <div class="metric">
-                    <div class="metric-value" id="velocity-display">0.0</div>
-                    <div class="metric-label">Velocity (m/s)</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-value" id="pressure-display">0.0</div>
-                    <div class="metric-label">Pressure (kPa)</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-value" id="efficiency-display">0.0</div>
-                    <div class="metric-label">Efficiency (%)</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-value" id="turbulence-display">0.0</div>
-                    <div class="metric-label">Turbulence (%)</div>
-                </div>
+            <div class="metric">
+                <div class="metric-value" id="pressure-display">0.0</div>
+                <div class="metric-label">Pressure (kPa)</div>
             </div>
+            <div class="metric">
+                <div class="metric-value" id="temperature-display">0.0</div>
+                <div class="metric-label">Temperature (°C)</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="turbulence-display">0.0</div>
+                <div class="metric-label">Turbulence (%)</div>
+            </div>
+        </div>
 
-            <div class="dashboard">
-                <div class="card">
-                    <h3 style="margin-bottom: 10px; font-size: 1.1em;">Real-time Chart</h3>
-                    <canvas id="chart" class="chart"></canvas>
-                </div>
-                <div class="card">
-                    <h3 style="margin-bottom: 10px; font-size: 1.1em;">Recent Data</h3>
-                    <div id="data-log" class="data-log">
-                        <p style="opacity: 0.7;">No data yet...</p>
+        <div class="dashboard">
+            <div class="card">
+                <h3 style="margin-bottom: 10px; font-size: 1.1em;">Wind Tunnel Simulation</h3>
+                <div class="simulation-container">
+                    <canvas id="simulationCanvas" class="simulation-canvas"></canvas>
+                    <div class="simulation-overlay">
+                        <div>Wind Speed: <span id="sim-velocity">0.0</span> m/s</div>
+                        <div>Particles: <span id="sim-particles">0</span></div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- 2D Simulation Page -->
-        <div id="simulation" class="page">
-            <div class="card" style="height: 100%;">
-                <h3 style="margin-bottom: 10px; font-size: 1.1em;">2D Wind Tunnel Simulation</h3>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <button class="btn btn-mode" onclick="startSimulation()">Start Simulation</button>
-                    <button class="btn btn-stop" onclick="stopSimulation()">Stop Simulation</button>
-                    <button class="btn btn-mode" onclick="resetSimulation()">Reset</button>
-                </div>
-                <canvas id="simulation-canvas" style="width: 100%; height: calc(100% - 60px); border: 1px solid #555; background: #333;"></canvas>
+            <div class="card">
+                <h3 style="margin-bottom: 10px; font-size: 1.1em;">Real-time Chart</h3>
+                <canvas id="chart" class="chart"></canvas>
             </div>
-        </div>
-
-        <!-- Graphs Page -->
-        <div id="graphs" class="page">
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; height: 100%;">
-                <div class="card">
-                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Velocity vs Time</h4>
-                    <canvas id="graph1" class="chart"></canvas>
-                </div>
-                <div class="card">
-                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Pressure vs Time</h4>
-                    <canvas id="graph2" class="chart"></canvas>
-                </div>
-                <div class="card">
-                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Turbulence vs Time</h4>
-                    <canvas id="graph3" class="chart"></canvas>
-                </div>
-                <div class="card">
-                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Efficiency vs Time</h4>
-                    <canvas id="graph4" class="chart"></canvas>
-                </div>
-                <div class="card">
-                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Flow Rate vs Time</h4>
-                    <canvas id="graph5" class="chart"></canvas>
-                </div>
-                <div class="card">
-                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Power vs Time</h4>
-                    <canvas id="graph6" class="chart"></canvas>
-                </div>
-                <div class="card">
-                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Reynolds Number</h4>
-                    <canvas id="graph7" class="chart"></canvas>
-                </div>
-                <div class="card">
-                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Drag Coefficient</h4>
-                    <canvas id="graph8" class="chart"></canvas>
-                </div>
-                <div class="card">
-                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Lift Coefficient</h4>
-                    <canvas id="graph9" class="chart"></canvas>
+            <div class="card">
+                <h3 style="margin-bottom: 10px; font-size: 1.1em;">Recent Data</h3>
+                <div id="data-log" class="data-log">
+                    <p style="opacity: 0.7;">No data yet...</p>
                 </div>
             </div>
         </div>
-
-        <!-- Settings Page -->
-        <div id="settings" class="page">
-            <div class="card" style="height: 100%;">
-                <h3 style="margin-bottom: 15px; font-size: 1.1em;">System Settings</h3>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: calc(100% - 40px);">
-                    <div>
-                        <h4 style="margin-bottom: 10px; color: #ffffff;">Data Collection</h4>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Sample Rate (Hz)</label>
-                            <input type="number" id="sample-rate" value="10" min="1" max="100" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Data Buffer Size</label>
-                            <input type="number" id="buffer-size" value="1000" min="100" max="10000" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Auto-Export</label>
-                            <select id="auto-export" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
-                                <option value="disabled">Disabled</option>
-                                <option value="hourly">Hourly</option>
-                                <option value="daily">Daily</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <h4 style="margin-bottom: 10px; color: #ffffff;">Display Settings</h4>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Theme</label>
-                            <select id="theme" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
-                                <option value="dark">Dark</option>
-                                <option value="light">Light</option>
-                            </select>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Chart Update Rate (ms)</label>
-                            <input type="number" id="chart-rate" value="1000" min="100" max="5000" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Alert Threshold</label>
-                            <input type="number" id="alert-threshold" value="90" min="0" max="100" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="text-align: center; margin-top: 20px;">
-                    <button class="btn btn-start" onclick="saveSettings()">Save Settings</button>
-                    <button class="btn btn-mode" onclick="resetSettings()">Reset to Default</button>
-                </div>
-            </div>
-        </div>
-    </div>
     </div>
 
     <script>
@@ -536,6 +402,7 @@
         let currentMode = 'simulation';
         let dataBuffer = [];
         let chart = null;
+        let simulation = null;
 
         // Initialize chart
         function initChart() {
@@ -554,6 +421,336 @@
             canvas.height = canvas.offsetHeight;
             
             drawChart();
+        }
+
+        // WebGL Wind Tunnel Simulation Class
+        class WindTunnelSimulation {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.gl = null;
+                this.program = null;
+                this.particles = [];
+                this.maxParticles = 2000;
+                this.windSpeed = 0.0;
+                this.turbulence = 0.0;
+                this.animationId = null;
+                this.lastTime = 0;
+                
+                this.init();
+            }
+            
+            init() {
+                // Get WebGL context
+                this.gl = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+                
+                if (!this.gl) {
+                    console.warn('WebGL not supported, falling back to 2D canvas');
+                    this.fallbackTo2D();
+                    return;
+                }
+                
+                // Set canvas size
+                this.canvas.width = this.canvas.offsetWidth;
+                this.canvas.height = this.canvas.offsetHeight;
+                this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Create shader program
+                this.createShaderProgram();
+                
+                // Initialize particles
+                this.initParticles();
+                
+                // Start animation loop
+                this.animate();
+            }
+            
+            createShaderProgram() {
+                const vertexShaderSource = `
+                    attribute vec2 a_position;
+                    attribute float a_size;
+                    attribute vec3 a_color;
+                    
+                    uniform vec2 u_resolution;
+                    uniform float u_time;
+                    
+                    varying vec3 v_color;
+                    varying float v_alpha;
+                    
+                    void main() {
+                        vec2 position = a_position / u_resolution * 2.0 - 1.0;
+                        position.y *= -1.0;
+                        
+                        gl_Position = vec4(position, 0.0, 1.0);
+                        gl_PointSize = a_size;
+                        
+                        v_color = a_color;
+                        v_alpha = a_color.b; // Use blue channel for alpha
+                    }
+                `;
+                
+                const fragmentShaderSource = `
+                    precision mediump float;
+                    
+                    varying vec3 v_color;
+                    varying float v_alpha;
+                    
+                    void main() {
+                        vec2 coord = gl_PointCoord - 0.5;
+                        float dist = length(coord);
+                        
+                        if (dist > 0.5) {
+                            discard;
+                        }
+                        
+                        float alpha = (1.0 - dist * 2.0) * v_alpha;
+                        gl_FragColor = vec4(v_color.rgb, alpha);
+                    }
+                `;
+                
+                const vertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexShaderSource);
+                const fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentShaderSource);
+                
+                this.program = this.gl.createProgram();
+                this.gl.attachShader(this.program, vertexShader);
+                this.gl.attachShader(this.program, fragmentShader);
+                this.gl.linkProgram(this.program);
+                
+                if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
+                    console.error('Error linking shader program:', this.gl.getProgramInfoLog(this.program));
+                    this.fallbackTo2D();
+                    return;
+                }
+                
+                this.gl.useProgram(this.program);
+                
+                // Get attribute and uniform locations
+                this.positionLocation = this.gl.getAttribLocation(this.program, 'a_position');
+                this.sizeLocation = this.gl.getAttribLocation(this.program, 'a_size');
+                this.colorLocation = this.gl.getAttribLocation(this.program, 'a_color');
+                this.resolutionLocation = this.gl.getUniformLocation(this.program, 'u_resolution');
+                this.timeLocation = this.gl.getUniformLocation(this.program, 'u_time');
+                
+                // Enable blending for particles
+                this.gl.enable(this.gl.BLEND);
+                this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+            }
+            
+            createShader(type, source) {
+                const shader = this.gl.createShader(type);
+                this.gl.shaderSource(shader, source);
+                this.gl.compileShader(shader);
+                
+                if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+                    console.error('Error compiling shader:', this.gl.getShaderInfoLog(shader));
+                    this.gl.deleteShader(shader);
+                    return null;
+                }
+                
+                return shader;
+            }
+            
+            initParticles() {
+                this.particles = [];
+                for (let i = 0; i < this.maxParticles; i++) {
+                    this.particles.push(this.createParticle());
+                }
+            }
+            
+            createParticle() {
+                const canvas = this.canvas;
+                return {
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: 0.5 + Math.random() * 2.0,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    life: Math.random(),
+                    maxLife: 3.0 + Math.random() * 2.0,
+                    size: 1.0 + Math.random() * 3.0,
+                    color: {
+                        r: 0.0 + Math.random() * 0.3,
+                        g: 0.5 + Math.random() * 0.5,
+                        b: 0.8 + Math.random() * 0.2
+                    }
+                };
+            }
+            
+            updateParticles(deltaTime) {
+                const canvas = this.canvas;
+                const speedMultiplier = 1.0 + (this.windSpeed / 20.0);
+                const turbulenceStrength = this.turbulence / 100.0;
+                
+                for (let i = 0; i < this.particles.length; i++) {
+                    const particle = this.particles[i];
+                    
+                    // Update velocity based on wind speed
+                    particle.vx = (0.5 + Math.random() * 2.0) * speedMultiplier;
+                    
+                    // Add turbulence
+                    if (turbulenceStrength > 0) {
+                        particle.vx += (Math.random() - 0.5) * turbulenceStrength * 5.0;
+                        particle.vy += (Math.random() - 0.5) * turbulenceStrength * 2.0;
+                    }
+                    
+                    // Update position
+                    particle.x += particle.vx * deltaTime * 60.0;
+                    particle.y += particle.vy * deltaTime * 60.0;
+                    
+                    // Update life
+                    particle.life += deltaTime;
+                    
+                    // Reset particle if it goes off screen or dies
+                    if (particle.x > canvas.width + 20 || particle.life > particle.maxLife) {
+                        // Reset particle at left edge
+                        particle.x = -20;
+                        particle.y = Math.random() * canvas.height;
+                        particle.life = 0;
+                        particle.maxLife = 3.0 + Math.random() * 2.0;
+                        particle.size = 1.0 + Math.random() * 3.0;
+                        particle.vy = (Math.random() - 0.5) * 0.5;
+                    }
+                    
+                    // Keep particles within vertical bounds
+                    if (particle.y < 0) particle.y = 0;
+                    if (particle.y > canvas.height) particle.y = canvas.height;
+                }
+            }
+            
+            render() {
+                if (!this.gl || !this.program) return;
+                
+                // Clear canvas
+                this.gl.clearColor(0.1, 0.1, 0.18, 1.0);
+                this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+                
+                // Update uniforms
+                this.gl.uniform2f(this.resolutionLocation, this.canvas.width, this.canvas.height);
+                this.gl.uniform1f(this.timeLocation, performance.now() / 1000.0);
+                
+                // Prepare particle data
+                const positions = [];
+                const sizes = [];
+                const colors = [];
+                
+                for (const particle of this.particles) {
+                    positions.push(particle.x, particle.y);
+                    sizes.push(particle.size);
+                    
+                    // Calculate alpha based on life
+                    const alpha = Math.max(0, 1.0 - (particle.life / particle.maxLife));
+                    colors.push(particle.color.r, particle.color.g, alpha);
+                }
+                
+                // Create and bind buffers
+                const positionBuffer = this.gl.createBuffer();
+                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
+                this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.DYNAMIC_DRAW);
+                this.gl.enableVertexAttribArray(this.positionLocation);
+                this.gl.vertexAttribPointer(this.positionLocation, 2, this.gl.FLOAT, false, 0, 0);
+                
+                const sizeBuffer = this.gl.createBuffer();
+                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, sizeBuffer);
+                this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(sizes), this.gl.DYNAMIC_DRAW);
+                this.gl.enableVertexAttribArray(this.sizeLocation);
+                this.gl.vertexAttribPointer(this.sizeLocation, 1, this.gl.FLOAT, false, 0, 0);
+                
+                const colorBuffer = this.gl.createBuffer();
+                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
+                this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.DYNAMIC_DRAW);
+                this.gl.enableVertexAttribArray(this.colorLocation);
+                this.gl.vertexAttribPointer(this.colorLocation, 3, this.gl.FLOAT, false, 0, 0);
+                
+                // Draw particles
+                this.gl.drawArrays(this.gl.POINTS, 0, this.particles.length);
+                
+                // Clean up buffers
+                this.gl.deleteBuffer(positionBuffer);
+                this.gl.deleteBuffer(sizeBuffer);
+                this.gl.deleteBuffer(colorBuffer);
+            }
+            
+            animate() {
+                const currentTime = performance.now();
+                const deltaTime = (currentTime - this.lastTime) / 1000.0;
+                this.lastTime = currentTime;
+                
+                this.updateParticles(deltaTime);
+                this.render();
+                
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+            
+            fallbackTo2D() {
+                // Fallback to 2D canvas if WebGL fails
+                console.log('Using 2D canvas fallback');
+                this.canvas.getContext('2d');
+                this.animate2D();
+            }
+            
+            animate2D() {
+                const ctx = this.canvas.getContext('2d');
+                
+                const draw = () => {
+                    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    
+                    // Simple 2D particle system
+                    ctx.fillStyle = 'rgba(0, 120, 212, 0.6)';
+                    
+                    for (let i = 0; i < 50; i++) {
+                        const x = (Date.now() / 50 + i * 20) % (this.canvas.width + 20);
+                        const y = 50 + Math.sin(Date.now() / 1000 + i) * 30;
+                        const size = 2 + Math.sin(Date.now() / 500 + i) * 1;
+                        
+                        ctx.beginPath();
+                        ctx.arc(x, y, size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    
+                    this.animationId = requestAnimationFrame(draw);
+                };
+                
+                draw();
+            }
+            
+            updateWindSpeed(speed) {
+                this.windSpeed = speed;
+                // Update overlay display
+                const overlay = document.getElementById('sim-velocity');
+                if (overlay) {
+                    overlay.textContent = speed.toFixed(1);
+                }
+                
+                const particleCount = document.getElementById('sim-particles');
+                if (particleCount) {
+                    particleCount.textContent = this.particles.length;
+                }
+            }
+            
+            updateTurbulence(turbulence) {
+                this.turbulence = turbulence;
+            }
+            
+            resize() {
+                this.canvas.width = this.canvas.offsetWidth;
+                this.canvas.height = this.canvas.offsetHeight;
+                
+                if (this.gl) {
+                    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+                }
+            }
+            
+            destroy() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+            }
+        }
+
+        // Initialize simulation
+        function initSimulation() {
+            const canvas = document.getElementById('simulationCanvas');
+            if (canvas) {
+                simulation = new WindTunnelSimulation(canvas);
+            }
         }
 
         // Draw simple chart
@@ -684,174 +881,13 @@
         function updateMetrics(data) {
             document.getElementById('velocity-display').textContent = data.velocity || '0.0';
             document.getElementById('pressure-display').textContent = data.pressure || '0.0';
-            document.getElementById('efficiency-display').textContent = data.efficiency || '0.0';
+            document.getElementById('temperature-display').textContent = data.temperature || '0.0';
             document.getElementById('turbulence-display').textContent = data.turbulence || '0.0';
-        }
-
-        // Navigation functions
-        function showPage(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             
-            // Show selected page
-            document.getElementById(pageId).classList.add('active');
-            event.target.classList.add('active');
-            
-            // Reinitialize charts when switching pages
-            if (pageId === 'dashboard') {
-                setTimeout(() => {
-                    if (chart) {
-                        chart.canvas.width = chart.canvas.offsetWidth;
-                        chart.canvas.height = chart.canvas.offsetHeight;
-                        drawChart();
-                    }
-                }, 100);
-            } else if (pageId === 'graphs') {
-                setTimeout(() => initGraphs(), 100);
-            } else if (pageId === 'simulation') {
-                setTimeout(() => initSimulation(), 100);
-            }
-        }
-
-        // Initialize 9 graphs
-        function initGraphs() {
-            for (let i = 1; i <= 9; i++) {
-                const canvas = document.getElementById(`graph${i}`);
-                if (canvas) {
-                    canvas.width = canvas.offsetWidth;
-                    canvas.height = canvas.offsetHeight;
-                    drawMiniChart(canvas, i);
-                }
-            }
-        }
-
-        // Draw mini charts for graphs page
-        function drawMiniChart(canvas, chartIndex) {
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Generate sample data based on chart index
-            const data = [];
-            for (let i = 0; i < 20; i++) {
-                data.push(Math.sin(i * 0.3 + chartIndex) * 50 + 50 + Math.random() * 20);
-            }
-            
-            // Draw simple line chart
-            ctx.strokeStyle = '#0078d4';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            
-            data.forEach((value, index) => {
-                const x = (index / (data.length - 1)) * canvas.width;
-                const y = canvas.height - (value / 100) * canvas.height;
-                
-                if (index === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            });
-            
-            ctx.stroke();
-        }
-
-        // Initialize 2D simulation
-        function initSimulation() {
-            const canvas = document.getElementById('simulation-canvas');
-            if (!canvas) return;
-            
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw wind tunnel outline
-            ctx.strokeStyle = '#555';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
-            
-            // Draw airflow lines
-            ctx.strokeStyle = '#0078d4';
-            ctx.lineWidth = 1;
-            
-            for (let y = 70; y < canvas.height - 70; y += 20) {
-                ctx.beginPath();
-                ctx.moveTo(60, y);
-                ctx.lineTo(canvas.width - 60, y);
-                ctx.stroke();
-                
-                // Add arrows
-                for (let x = 80; x < canvas.width - 80; x += 40) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, y);
-                    ctx.lineTo(x - 5, y - 3);
-                    ctx.moveTo(x, y);
-                    ctx.lineTo(x - 5, y + 3);
-                    ctx.stroke();
-                }
-            }
-            
-            // Draw test object (rectangle)
-            ctx.fillStyle = '#d83b01';
-            ctx.fillRect(canvas.width / 2 - 20, canvas.height / 2 - 30, 40, 60);
-        }
-
-        // Simulation controls
-        function startSimulation() {
-            console.log('Starting 2D simulation...');
-            // Add simulation logic here
-        }
-
-        function stopSimulation() {
-            console.log('Stopping 2D simulation...');
-            // Add stop logic here
-        }
-
-        function resetSimulation() {
-            console.log('Resetting 2D simulation...');
-            initSimulation();
-        }
-
-        // Settings functions
-        function saveSettings() {
-            const settings = {
-                sampleRate: document.getElementById('sample-rate').value,
-                bufferSize: document.getElementById('buffer-size').value,
-                autoExport: document.getElementById('auto-export').value,
-                theme: document.getElementById('theme').value,
-                chartRate: document.getElementById('chart-rate').value,
-                alertThreshold: document.getElementById('alert-threshold').value
-            };
-            
-            localStorage.setItem('windTunnelSettings', JSON.stringify(settings));
-            alert('Settings saved successfully!');
-        }
-
-        function resetSettings() {
-            document.getElementById('sample-rate').value = '10';
-            document.getElementById('buffer-size').value = '1000';
-            document.getElementById('auto-export').value = 'disabled';
-            document.getElementById('theme').value = 'dark';
-            document.getElementById('chart-rate').value = '1000';
-            document.getElementById('alert-threshold').value = '90';
-            
-            localStorage.removeItem('windTunnelSettings');
-            alert('Settings reset to default!');
-        }
-
-        // Load settings on page load
-        function loadSettings() {
-            const settings = localStorage.getItem('windTunnelSettings');
-            if (settings) {
-                const parsed = JSON.parse(settings);
-                document.getElementById('sample-rate').value = parsed.sampleRate || '10';
-                document.getElementById('buffer-size').value = parsed.bufferSize || '1000';
-                document.getElementById('auto-export').value = parsed.autoExport || 'disabled';
-                document.getElementById('theme').value = parsed.theme || 'dark';
-                document.getElementById('chart-rate').value = parsed.chartRate || '1000';
-                document.getElementById('alert-threshold').value = parsed.alertThreshold || '90';
+            // Update simulation with new data
+            if (simulation) {
+                simulation.updateWindSpeed(parseFloat(data.velocity) || 0);
+                simulation.updateTurbulence(parseFloat(data.turbulence) || 0);
             }
         }
 
@@ -865,7 +901,7 @@
             entry.style.color = '#e0e0e0';
             entry.innerHTML = `
                 <strong style="color: #ffffff;">${timestamp}</strong><br>
-                <span style="color: #b0b0b0;">V: ${data.velocity} m/s | P: ${data.pressure} kPa | E: ${data.efficiency}%</span>
+                <span style="color: #b0b0b0;">V: ${data.velocity} m/s | P: ${data.pressure} kPa | T: ${data.temperature}°C</span>
             `;
             
             logEl.insertBefore(entry, logEl.firstChild);
@@ -928,7 +964,7 @@
             });
             
             initChart();
-            loadSettings();
+            initSimulation();
             
             // Auto-start for demo
             setTimeout(startCollection, 1000);
@@ -951,16 +987,8 @@
                 drawChart();
             }
             
-            // Resize graphs if on graphs page
-            const graphsPage = document.getElementById('graphs');
-            if (graphsPage.classList.contains('active')) {
-                setTimeout(() => initGraphs(), 100);
-            }
-            
-            // Resize simulation if on simulation page
-            const simulationPage = document.getElementById('simulation');
-            if (simulationPage.classList.contains('active')) {
-                setTimeout(() => initSimulation(), 100);
+            if (simulation) {
+                simulation.resize();
             }
         });
     </script>

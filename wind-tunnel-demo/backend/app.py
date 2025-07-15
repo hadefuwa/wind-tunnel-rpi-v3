@@ -38,15 +38,14 @@ def generate_realistic_data():
     # Simulate pressure differential
     pressure = 101.3 + (velocity * 0.5) + random.uniform(-0.5, 0.5)
     
-    # Calculate efficiency based on velocity and pressure
-    efficiency = min(95.0, (velocity / 20.0) * 100 + random.uniform(-5.0, 5.0))
-    efficiency = max(0.0, efficiency)
+    # Simulate temperature (affected by airflow)
+    temperature = 23.0 + (velocity * 0.1) + random.uniform(-1.0, 1.0)
     
     return {
         'timestamp': timestamp,
         'velocity': round(velocity, 2),
         'pressure': round(pressure, 2),
-        'efficiency': round(efficiency, 1),
+        'temperature': round(temperature, 2),
         'turbulence': round(random.uniform(0, 100), 1)
     }
 
