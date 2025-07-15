@@ -37,3 +37,7 @@ git push -u origin main
 echo "Repository pushed to GitHub!"
 echo "Clone on Raspberry Pi with:"
 echo "git clone https://github.com/hadefuwa/wind-tunnel-rpi-v3.git"
+echo ""
+echo "For future updates on Pi:"
+echo "cd wind-tunnel-rpi-v3"
+echo "./git-pull-update.sh"

@@ -32,6 +32,9 @@ Write-Host "   cd wind-tunnel-rpi-v3" -ForegroundColor White
 Write-Host "   chmod +x setup_pi.sh" -ForegroundColor White
 Write-Host "   ./setup_pi.sh" -ForegroundColor White
 Write-Host ""
-Write-Host "🚀 Demo will be ready in 2 minutes!" -ForegroundColor Green
+Write-Host "� For future updates, run on Pi:" -ForegroundColor Yellow
+Write-Host "   ./git-pull-update.sh" -ForegroundColor White
+Write-Host ""
+Write-Host "�🚀 Demo will be ready in 2 minutes!" -ForegroundColor Green
 Write-Host ""
 Read-Host "Press Enter to continue..."
