@@ -21,8 +21,8 @@ sudo apt install python3-spidev -y
 # Clone the repository
 git clone https://github.com/hadefuwa/wind-tunnel-rpi-v3.git
 
-# Navigate to demo folder
-cd wind-tunnel-rpi-v3/wind-tunnel-demo
+# Navigate to project folder
+cd wind-tunnel-rpi-v3
 ```
 
 ### 2. Install Dependencies
@@ -163,7 +163,7 @@ After=network.target
 [Service]
 Type=simple
 User=pi
-WorkingDirectory=/home/pi/wind-tunnel-rpi-v3/wind-tunnel-demo/backend
+WorkingDirectory=/home/pi/wind-tunnel-rpi-v3/backend
 ExecStart=/usr/bin/python3 app.py
 Restart=always
 RestartSec=10
