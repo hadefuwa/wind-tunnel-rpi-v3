@@ -707,7 +707,10 @@
         // Simple chart implementation
         function drawSimpleChart(canvasId, data, label, color) {
             const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
+            if (!canvas) {
+                console.log('Canvas not found:', canvasId);
+                return;
+            }
             
             const ctx = canvas.getContext('2d');
             
@@ -716,22 +719,28 @@
             canvas.width = rect.width;
             canvas.height = rect.height;
             
+            // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            if (data.length === 0) {
+            // Check if we have data
+            if (!data || data.length === 0) {
                 ctx.fillStyle = '#666';
                 ctx.font = '16px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('No data available', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('Waiting for data...', canvas.width / 2, canvas.height / 2);
                 return;
             }
             
             // Calculate chart area
-            const padding = 40;
+            const padding = 50;
             const chartWidth = canvas.width - 2 * padding;
             const chartHeight = canvas.height - 2 * padding;
             
             // Draw background
+            ctx.fillStyle = '#2a2a2a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw chart background
             ctx.fillStyle = '#1a1a1a';
             ctx.fillRect(padding, padding, chartWidth, chartHeight);
             
@@ -762,19 +771,34 @@
                 ctx.stroke();
             }
             
+            // Filter out invalid data
+            const validData = data.filter(d => !isNaN(d) && d !== null && d !== undefined);
+            
+            if (validData.length === 0) {
+                ctx.fillStyle = '#666';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No valid data', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+            
+            // Calculate min/max values
+            const maxVal = Math.max(...validData);
+            const minVal = Math.min(...validData);
+            const range = maxVal - minVal;
+            
+            // Handle case where all values are the same
+            const normalizedRange = range || 1;
+            
             // Draw data line
-            if (data.length > 1) {
-                const maxVal = Math.max(...data);
-                const minVal = Math.min(...data);
-                const range = maxVal - minVal || 1;
-                
+            if (validData.length > 1) {
                 ctx.strokeStyle = color;
                 ctx.lineWidth = 3;
                 ctx.beginPath();
                 
-                data.forEach((value, index) => {
-                    const x = padding + (index / (data.length - 1)) * chartWidth;
-                    const y = padding + chartHeight - ((value - minVal) / range) * chartHeight;
+                validData.forEach((value, index) => {
+                    const x = padding + (index / (validData.length - 1)) * chartWidth;
+                    const y = padding + chartHeight - ((value - minVal) / normalizedRange) * chartHeight;
                     
                     if (index === 0) {
                         ctx.moveTo(x, y);
@@ -787,30 +811,41 @@
                 
                 // Draw data points
                 ctx.fillStyle = color;
-                data.forEach((value, index) => {
-                    const x = padding + (index / (data.length - 1)) * chartWidth;
-                    const y = padding + chartHeight - ((value - minVal) / range) * chartHeight;
+                validData.forEach((value, index) => {
+                    const x = padding + (index / (validData.length - 1)) * chartWidth;
+                    const y = padding + chartHeight - ((value - minVal) / normalizedRange) * chartHeight;
                     
                     ctx.beginPath();
                     ctx.arc(x, y, 4, 0, Math.PI * 2);
                     ctx.fill();
                 });
-                
-                // Draw value labels
-                ctx.fillStyle = '#b0b0b0';
-                ctx.font = '12px Arial';
-                ctx.textAlign = 'center';
-                
-                // Min and max values
-                ctx.fillText(minVal.toFixed(1), padding - 5, padding + chartHeight + 15);
-                ctx.fillText(maxVal.toFixed(1), padding - 5, padding + 15);
+            }
+            
+            // Draw value labels
+            ctx.fillStyle = '#b0b0b0';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'left';
+            
+            // Min value
+            ctx.fillText(minVal.toFixed(1), padding + 5, padding + chartHeight - 5);
+            
+            // Max value
+            ctx.fillText(maxVal.toFixed(1), padding + 5, padding + 15);
+            
+            // Current value
+            if (validData.length > 0) {
+                const currentValue = validData[validData.length - 1];
+                ctx.fillStyle = color;
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(currentValue.toFixed(1), canvas.width - padding - 5, padding + 15);
             }
             
             // Draw label
             ctx.fillStyle = '#b0b0b0';
             ctx.font = '14px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(label, canvas.width / 2, canvas.height - 10);
+            ctx.fillText(label, canvas.width / 2, canvas.height - 15);
         }
 
         // Tab switching
@@ -826,6 +861,18 @@
             document.getElementById(tabName).classList.add('active');
             
             event.target.classList.add('active');
+            
+            // Redraw charts when switching to tabs with charts
+            setTimeout(() => {
+                if (tabName === 'graphs' && dataBuffer.length > 0) {
+                    const lastData = dataBuffer[dataBuffer.length - 1];
+                    updateCharts(lastData);
+                }
+                if (tabName === 'dashboard' && dataBuffer.length > 0) {
+                    const lastData = dataBuffer[dataBuffer.length - 1];
+                    updateCharts(lastData);
+                }
+            }, 100);
         }
 
         // Connection test
@@ -982,14 +1029,14 @@
             }
             
             // Extract data for charts
-            const velocityData = dataBuffer.map(d => d.velocity);
-            const flowRateData = dataBuffer.map(d => d.flowRate);
-            const diffPressureData = dataBuffer.map(d => d.diffPressure);
-            const staticPressureData = dataBuffer.map(d => d.staticPressure);
-            const fanSpeedData = dataBuffer.map(d => d.fanSpeed);
-            const powerData = dataBuffer.map(d => d.power);
-            const valveData = dataBuffer.map(d => d.valvePosition);
-            const dragData = dataBuffer.map(d => d.dragForce);
+            const velocityData = dataBuffer.map(d => parseFloat(d.velocity) || 0);
+            const flowRateData = dataBuffer.map(d => parseFloat(d.flowRate) || 0);
+            const diffPressureData = dataBuffer.map(d => parseFloat(d.diffPressure) || 0);
+            const staticPressureData = dataBuffer.map(d => parseFloat(d.staticPressure) || 0);
+            const fanSpeedData = dataBuffer.map(d => parseFloat(d.fanSpeed) || 0);
+            const powerData = dataBuffer.map(d => parseFloat(d.power) || 0);
+            const valveData = dataBuffer.map(d => parseFloat(d.valvePosition) || 0);
+            const dragData = dataBuffer.map(d => parseFloat(d.dragForce) || 0);
             
             // Dashboard charts
             drawSimpleChart('velocityChart', velocityData, 'Velocity (m/s)', '#3498db');
@@ -1002,6 +1049,13 @@
             drawSimpleChart('fanPowerChart', fanSpeedData, 'Fan Speed (RPM)', '#f39c12');
             drawSimpleChart('valveChart', valveData, 'Valve Position (%)', '#9b59b6');
             drawSimpleChart('dragChart', dragData, 'Drag Force (N)', '#e67e22');
+            
+            // Debug logging
+            console.log('Chart data updated:', {
+                velocity: velocityData.slice(-3),
+                flowRate: flowRateData.slice(-3),
+                pressure: diffPressureData.slice(-3)
+            });
         }
 
         // Data fetching with better error handling
@@ -1029,54 +1083,64 @@
             }
         }
 
-        // Initialize canvas simulation
-        function initSimulation() {
-            const canvas = document.getElementById('simulationCanvas');
-            const canvas2 = document.getElementById('simulationCanvas2');
-            
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
-                
-                // Simple particle simulation
-                function drawParticles() {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    
-                    // Draw some moving particles
-                    ctx.fillStyle = '#3498db';
-                    for (let i = 0; i < 20; i++) {
-                        const x = (Date.now() / 50 + i * 50) % canvas.width;
-                        const y = canvas.height / 2 + Math.sin(Date.now() / 500 + i) * 50;
-                        ctx.beginPath();
-                        ctx.arc(x, y, 3, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                }
-                
-                setInterval(drawParticles, 100);
-                document.getElementById('sim-particles').textContent = '20';
-                document.getElementById('sim-particles2').textContent = '20';
+        // Initialize charts with sample data
+        function initializeCharts() {
+            // Create some sample data points
+            const sampleData = [];
+            for (let i = 0; i < 10; i++) {
+                sampleData.push({
+                    velocity: 15 + Math.random() * 5,
+                    flowRate: 800 + Math.random() * 200,
+                    diffPressure: 150 + Math.random() * 50,
+                    staticPressure: 101300 + Math.random() * 200,
+                    fanSpeed: 2000 + Math.random() * 500,
+                    power: 120 + Math.random() * 30,
+                    valvePosition: 60 + Math.random() * 20,
+                    dragForce: 12 + Math.random() * 5
+                });
             }
+            
+            // Add to buffer
+            dataBuffer.push(...sampleData);
+            
+            // Draw initial charts
+            if (dataBuffer.length > 0) {
+                updateCharts(dataBuffer[dataBuffer.length - 1]);
+            }
+            
+            console.log('Charts initialized with sample data');
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            initSimulation();
+            console.log('Application starting...');
+            
+            // Initialize charts with sample data
+            initializeCharts();
+            
+            // Test connection to backend
             testConnection();
             
             // Auto-start for demo
-            setTimeout(startCollection, 2000);
+            setTimeout(() => {
+                startCollection();
+                console.log('Auto-started data collection');
+            }, 3000);
             
             // Regular data updates
             setInterval(fetchLatestData, 1000);
             
             // Resize charts on window resize
             window.addEventListener('resize', function() {
-                if (dataBuffer.length > 0) {
-                    updateCharts(dataBuffer[dataBuffer.length - 1]);
-                }
+                setTimeout(() => {
+                    if (dataBuffer.length > 0) {
+                        const lastData = dataBuffer[dataBuffer.length - 1];
+                        updateCharts(lastData);
+                    }
+                }, 100);
             });
+            
+            console.log('Application initialized successfully');
         });
     </script>
 </body>
