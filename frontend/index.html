@@ -1103,12 +1103,19 @@
         // API functions with error handling
         async function startCollection() {
             try {
+                console.log('Starting data collection...');
                 const response = await fetch('/api/start', { method: 'POST' });
                 if (response.ok) {
                     const result = await response.json();
                     isRunning = true;
                     updateConnectionStatus(true);
-                    console.log('Started:', result);
+                    console.log('Started collection:', result);
+                    
+                    // Clear any existing "No data yet" message
+                    const logEl = document.getElementById('data-log-container');
+                    if (logEl.children.length === 1 && logEl.children[0].tagName === 'P') {
+                        logEl.innerHTML = '<p style="opacity: 0.7; text-align: center; margin-top: 100px;">Starting data collection...</p>';
+                    }
                 } else {
                     throw new Error('Server error');
                 }
@@ -1179,6 +1186,7 @@
         }
 
         function updateDataLog(data) {
+            console.log('updateDataLog called with:', data);
             const logEl = document.getElementById('data-log-container');
             const timestamp = new Date(data.timestamp * 1000).toLocaleTimeString();
             
@@ -1241,10 +1249,16 @@
 
         // Data fetching with better error handling
         async function fetchLatestData() {
+            if (!isRunning) {
+                console.log('Data collection not running, skipping fetch');
+                return;
+            }
+            
             try {
                 const response = await fetch('/api/latest');
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Fetched data:', data);
                     
                     if (!data.error && data) {
                         updateMetrics(data);
@@ -1256,9 +1270,11 @@
                         document.getElementById('dataCount').textContent = dataBuffer.length;
                     }
                 } else {
+                    console.error('Server error:', response.status);
                     throw new Error('Server error');
                 }
             } catch (error) {
+                console.error('Data fetch error:', error);
                 updateConnectionStatus(false);
                 // Don't spam console with errors
             }
