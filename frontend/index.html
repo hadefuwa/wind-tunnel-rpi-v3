@@ -1168,21 +1168,36 @@
             }
         }
 
-        // Update UI
+        // Update UI with error handling
         function updateMetrics(data) {
-            document.getElementById('velocity-display').textContent = data.velocity || '0.0';
-            document.getElementById('flow-rate-display').textContent = data.flowRate || '0.0';
-            document.getElementById('diff-pressure-display').textContent = data.diffPressure || '0.0';
-            document.getElementById('static-pressure-display').textContent = data.staticPressure || '0.0';
-            document.getElementById('fan-speed-display').textContent = data.fanSpeed || '0.0';
-            document.getElementById('power-display').textContent = data.power || '0.0';
-            document.getElementById('valve-position-display').textContent = data.valvePosition || '0.0';
-            document.getElementById('drag-force-display').textContent = data.dragForce || '0.0';
+            const elements = [
+                'velocity-display', 'flow-rate-display', 'diff-pressure-display', 'static-pressure-display',
+                'fan-speed-display', 'power-display', 'valve-position-display', 'drag-force-display'
+            ];
             
-            // Update simulation overlay
-            document.getElementById('sim-velocity').textContent = data.velocity || '0.0';
-            document.getElementById('sim-velocity2').textContent = data.velocity || '0.0';
-            document.getElementById('sim-turbulence2').textContent = data.turbulence || '0.0';
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    const key = id.replace('-display', '').replace('-', '');
+                    const value = data[key] || data[id.replace('-display', '').replace('-', '')] || '0.0';
+                    element.textContent = value;
+                } else {
+                    console.warn(`Element ${id} not found`);
+                }
+            });
+            
+            // Update simulation overlay elements if they exist
+            const simElements = ['sim-velocity', 'sim-velocity2', 'sim-turbulence2'];
+            simElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (id.includes('velocity')) {
+                        element.textContent = data.velocity || '0.0';
+                    } else if (id.includes('turbulence')) {
+                        element.textContent = data.turbulence || '0.0';
+                    }
+                }
+            });
         }
 
         function updateDataLog(data) {
@@ -1250,7 +1265,6 @@
         // Data fetching with better error handling
         async function fetchLatestData() {
             if (!isRunning) {
-                console.log('Data collection not running, skipping fetch');
                 return;
             }
             
@@ -1266,8 +1280,11 @@
                         updateCharts(data);
                         updateConnectionStatus(true);
                         
-                        // Update data count
-                        document.getElementById('dataCount').textContent = dataBuffer.length;
+                        // Update data count safely
+                        const dataCountEl = document.getElementById('dataCount');
+                        if (dataCountEl) {
+                            dataCountEl.textContent = dataBuffer.length;
+                        }
                     }
                 } else {
                     console.error('Server error:', response.status);
@@ -1276,7 +1293,11 @@
             } catch (error) {
                 console.error('Data fetch error:', error);
                 updateConnectionStatus(false);
-                // Don't spam console with errors
+                
+                // If we can't connect to the server, show a more helpful message
+                if (error.message.includes('fetch') || error.message.includes('CONNECTION_REFUSED')) {
+                    console.log('Server connection failed - is the Flask app running?');
+                }
             }
         }
 
