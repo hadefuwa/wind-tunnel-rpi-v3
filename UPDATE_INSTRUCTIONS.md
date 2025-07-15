@@ -154,6 +154,7 @@ sudo systemctl stop wind-tunnel-demo.service 2>/dev/null
 
 # Pull latest changes
 echo "📥 Pulling latest changes..."
+git reset --hard origin/main
 git pull origin main
 
 # Update dependencies

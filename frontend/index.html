@@ -124,7 +124,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: auto 1fr;
-            gap: 10px;
+            gap: 15px;
             height: 100%;
             overflow: hidden;
         }
@@ -133,21 +133,31 @@
             grid-column: 1 / -1;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
         }
 
         .dashboard-left {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
             overflow: hidden;
         }
 
         .dashboard-right {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
             overflow: hidden;
+        }
+
+        .wind-tunnel-card {
+            flex: 2;
+            min-height: 300px;
+        }
+
+        .chart-card {
+            flex: 1;
+            min-height: 200px;
         }
 
         .card {
@@ -495,7 +505,9 @@
         <!-- Navigation -->
         <div class="nav">
             <div class="nav-item active" onclick="showTab('dashboard')">Dashboard</div>
-            <div class="nav-item" onclick="showTab('graphs')">Graphs/Data</div>
+            <div class="nav-item" onclick="showTab('controls')">Controls</div>
+            <div class="nav-item" onclick="showTab('graphs')">Graphs</div>
+            <div class="nav-item" onclick="showTab('data-log')">Data Log</div>
             <div class="nav-item" onclick="showTab('settings')">Settings</div>
         </div>
 
@@ -505,12 +517,6 @@
             <div id="dashboard" class="tab-content active">
                 <div class="dashboard">
                     <div class="dashboard-header">
-                        <div class="controls">
-                            <button class="btn btn-start" onclick="startCollection()">Start Collection</button>
-                            <button class="btn btn-stop" onclick="stopCollection()">Stop Collection</button>
-                            <button class="btn btn-mode" onclick="toggleMode()">Mode: <span id="mode-display">Simulation</span></button>
-                        </div>
-
                         <div class="metrics">
                             <div class="metric">
                                 <div class="metric-value" id="velocity-display">0.0</div>
@@ -548,40 +554,48 @@
                     </div>
 
                     <div class="dashboard-left">
-                        <div class="card">
+                        <div class="card wind-tunnel-card">
                             <h3>Wind Tunnel</h3>
                             <div class="tunnel-container">
                                 <img src="tunnel.png" alt="Wind Tunnel" class="tunnel-image" onerror="this.style.display='none'">
                             </div>
                         </div>
-                        <div class="card">
+                    </div>
+
+                    <div class="dashboard-right">
+                        <div class="card chart-card">
                             <h3>Velocity Chart</h3>
                             <div class="chart-container">
                                 <canvas id="velocityChart" class="simple-chart"></canvas>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="dashboard-right">
-                        <div class="card">
+                        <div class="card chart-card">
                             <h3>Pressure Chart</h3>
                             <div class="chart-container">
                                 <canvas id="pressureChart" class="simple-chart"></canvas>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <h3>Recent Data</h3>
-                            <div id="data-log" class="data-log">
-                                <p style="opacity: 0.7; text-align: center; margin-top: 50px;">No data yet...</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Graphs/Data Tab -->
+            <!-- Controls Tab -->
+            <div id="controls" class="tab-content">
+                <div class="card">
+                    <h3>System Controls</h3>
+                    <div class="controls" style="flex-direction: column; gap: 20px; align-items: center; margin-top: 30px;">
+                        <div style="display: flex; gap: 20px;">
+                            <button class="btn btn-start" onclick="startCollection()" style="padding: 20px 40px; font-size: 18px;">Start Collection</button>
+                            <button class="btn btn-stop" onclick="stopCollection()" style="padding: 20px 40px; font-size: 18px;">Stop Collection</button>
+                        </div>
+                        <button class="btn btn-mode" onclick="toggleMode()" style="padding: 20px 40px; font-size: 18px;">Mode: <span id="mode-display">Simulation</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphs Tab -->
             <div id="graphs" class="tab-content">
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; height: 100%; overflow: hidden;">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; height: 100%; overflow: hidden;">
                     <div class="card">
                         <h3>Velocity Over Time</h3>
                         <div class="chart-container">
@@ -617,6 +631,16 @@
                         <div class="chart-container">
                             <canvas id="dragChart" class="simple-chart"></canvas>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Log Tab -->
+            <div id="data-log" class="tab-content">
+                <div class="card" style="height: 100%;">
+                    <h3>Recent Data Entries</h3>
+                    <div id="data-log-container" class="data-log" style="height: calc(100% - 60px);">
+                        <p style="opacity: 0.7; text-align: center; margin-top: 100px;">No data yet...</p>
                     </div>
                 </div>
             </div>
@@ -686,8 +710,11 @@
             if (!canvas) return;
             
             const ctx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            
+            // Set canvas size to match display size
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
@@ -695,39 +722,59 @@
                 ctx.fillStyle = '#666';
                 ctx.font = '16px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('No data to display', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('No data available', canvas.width / 2, canvas.height / 2);
                 return;
             }
             
-            // Draw axes
+            // Calculate chart area
+            const padding = 40;
+            const chartWidth = canvas.width - 2 * padding;
+            const chartHeight = canvas.height - 2 * padding;
+            
+            // Draw background
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(padding, padding, chartWidth, chartHeight);
+            
+            // Draw border
             ctx.strokeStyle = '#555';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(padding, padding, chartWidth, chartHeight);
+            
+            // Draw grid lines
+            ctx.strokeStyle = '#333';
             ctx.lineWidth = 1;
             
-            // Y-axis
-            ctx.beginPath();
-            ctx.moveTo(50, 20);
-            ctx.lineTo(50, canvas.height - 30);
-            ctx.stroke();
+            // Vertical grid lines
+            for (let i = 1; i < 5; i++) {
+                const x = padding + (i * chartWidth / 5);
+                ctx.beginPath();
+                ctx.moveTo(x, padding);
+                ctx.lineTo(x, padding + chartHeight);
+                ctx.stroke();
+            }
             
-            // X-axis
-            ctx.beginPath();
-            ctx.moveTo(50, canvas.height - 30);
-            ctx.lineTo(canvas.width - 20, canvas.height - 30);
-            ctx.stroke();
+            // Horizontal grid lines
+            for (let i = 1; i < 4; i++) {
+                const y = padding + (i * chartHeight / 4);
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(padding + chartWidth, y);
+                ctx.stroke();
+            }
             
             // Draw data line
             if (data.length > 1) {
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                
                 const maxVal = Math.max(...data);
                 const minVal = Math.min(...data);
                 const range = maxVal - minVal || 1;
                 
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
                 data.forEach((value, index) => {
-                    const x = 50 + (index / (data.length - 1)) * (canvas.width - 70);
-                    const y = canvas.height - 30 - ((value - minVal) / range) * (canvas.height - 50);
+                    const x = padding + (index / (data.length - 1)) * chartWidth;
+                    const y = padding + chartHeight - ((value - minVal) / range) * chartHeight;
                     
                     if (index === 0) {
                         ctx.moveTo(x, y);
@@ -737,13 +784,33 @@
                 });
                 
                 ctx.stroke();
+                
+                // Draw data points
+                ctx.fillStyle = color;
+                data.forEach((value, index) => {
+                    const x = padding + (index / (data.length - 1)) * chartWidth;
+                    const y = padding + chartHeight - ((value - minVal) / range) * chartHeight;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                // Draw value labels
+                ctx.fillStyle = '#b0b0b0';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                
+                // Min and max values
+                ctx.fillText(minVal.toFixed(1), padding - 5, padding + chartHeight + 15);
+                ctx.fillText(maxVal.toFixed(1), padding - 5, padding + 15);
             }
             
-            // Labels
+            // Draw label
             ctx.fillStyle = '#b0b0b0';
-            ctx.font = '12px Arial';
+            ctx.font = '14px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(label, canvas.width / 2, canvas.height - 5);
+            ctx.fillText(label, canvas.width / 2, canvas.height - 10);
         }
 
         // Tab switching
@@ -882,7 +949,7 @@
         }
 
         function updateDataLog(data) {
-            const logEl = document.getElementById('data-log');
+            const logEl = document.getElementById('data-log-container');
             const timestamp = new Date(data.timestamp * 1000).toLocaleTimeString();
             
             // Clear "No data yet" message
