@@ -28,8 +28,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
+            background: #1a1a1a;
+            color: #e0e0e0;
             height: 100vh;
             overflow: hidden;
             /* Prevent text selection on touch */
@@ -45,23 +45,41 @@
             flex-direction: column;
             padding: 10px;
             max-width: 100%;
+            background: #1a1a1a;
         }
 
         .header {
             text-align: center;
-            color: white;
+            color: #ffffff;
             margin-bottom: 15px;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .header-content {
+            display: flex;
+            flex-direction: column;
         }
 
         .header h1 {
             font-size: 1.8em;
             margin-bottom: 5px;
+            color: #ffffff;
+            font-weight: 600;
         }
 
         .header p {
             font-size: 1em;
-            opacity: 0.9;
+            opacity: 0.8;
+            color: #b0b0b0;
         }
 
         .dashboard {
@@ -73,11 +91,10 @@
         }
 
         .card {
-            background: white;
-            border-radius: 10px;
+            background: #2a2a2a;
+            border: 1px solid #333;
             padding: 15px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             min-height: 0;
@@ -95,8 +112,9 @@
 
         .btn {
             padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
+            border: 1px solid #555;
+            background: #333;
+            color: #ffffff;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -108,30 +126,30 @@
         }
 
         .btn-start {
-            background: #4CAF50;
+            background: #0078d4;
             color: white;
         }
 
         .btn-start:hover {
-            background: #45a049;
+            background: #106ebe;
         }
 
         .btn-stop {
-            background: #f44336;
+            background: #d83b01;
             color: white;
         }
 
         .btn-stop:hover {
-            background: #da190b;
+            background: #c23000;
         }
 
         .btn-mode {
-            background: #2196F3;
+            background: #0078d4;
             color: white;
         }
 
         .btn-mode:hover {
-            background: #0b7dda;
+            background: #106ebe;
         }
 
         .metrics {
@@ -145,27 +163,29 @@
         .metric {
             text-align: center;
             padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: white;
+            background: #333;
+            border: 1px solid #555;
+            color: #ffffff;
         }
 
         .metric-value {
             font-size: 1.4em;
             font-weight: bold;
             margin-bottom: 3px;
+            color: #0078d4;
         }
 
         .metric-label {
             font-size: 0.8em;
             opacity: 0.8;
+            color: #b0b0b0;
         }
 
         .chart-container {
             grid-column: 1 / -1;
             flex: 1;
-            background: white;
-            border-radius: 10px;
+            background: #2a2a2a;
+            border: 1px solid #333;
             padding: 10px;
             position: relative;
             min-height: 0;
@@ -175,28 +195,28 @@
         .chart {
             width: 100%;
             height: 100%;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            border: 1px solid #555;
+            background: #333;
         }
 
         .status {
             text-align: center;
             padding: 8px;
-            border-radius: 6px;
             margin-bottom: 10px;
             font-weight: 600;
             font-size: 0.9em;
             flex-shrink: 0;
+            border: 1px solid #555;
         }
 
         .status.running {
-            background: #d4edda;
-            color: #155724;
+            background: #0d4f22;
+            color: #4caf50;
         }
 
         .status.stopped {
-            background: #f8d7da;
-            color: #721c24;
+            background: #4a1e1e;
+            color: #f44336;
         }
 
         .data-table {
@@ -210,12 +230,14 @@
         .data-table td {
             padding: 6px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #555;
+            color: #ffffff;
         }
 
         .data-table th {
-            background: #f8f9fa;
+            background: #333;
             font-weight: 600;
+            color: #ffffff;
         }
 
         .data-log {
@@ -287,17 +309,20 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌪️ Wind Tunnel Data Acquisition</h1>
-            <p>Real-time Airflow Analysis & Visualization</p>
+            <img src="logo.png" alt="Company Logo" class="logo">
+            <div class="header-content">
+                <h1>Wind Tunnel Data Acquisition</h1>
+                <p>Real-time Airflow Analysis & Visualization</p>
+            </div>
         </div>
 
         <div class="status" id="status">
-            ⏹️ System Ready
+            System Ready
         </div>
 
         <div class="controls">
-            <button class="btn btn-start" onclick="startCollection()">▶️ Start Collection</button>
-            <button class="btn btn-stop" onclick="stopCollection()">⏹️ Stop Collection</button>
+            <button class="btn btn-start" onclick="startCollection()">Start Collection</button>
+            <button class="btn btn-stop" onclick="stopCollection()">Stop Collection</button>
             <button class="btn btn-mode" onclick="toggleMode()">🔧 Mode: <span id="mode-display">Simulation</span></button>
         </div>
 
@@ -322,7 +347,7 @@
 
         <div class="dashboard">
             <div class="card">
-                <h3 style="margin-bottom: 10px; font-size: 1.1em;">📊 Real-time Chart</h3>
+                <h3 style="margin-bottom: 10px; font-size: 1.1em;">Real-time Chart</h3>
                 <canvas id="chart" class="chart"></canvas>
             </div>
             <div class="card">
@@ -378,7 +403,7 @@
             }
             
             // Draw axes
-            ctx.strokeStyle = '#ddd';
+            ctx.strokeStyle = '#555';
             ctx.lineWidth = 1;
             
             // Y-axis
@@ -395,7 +420,7 @@
             
             // Draw velocity line
             if (data.length > 1) {
-                ctx.strokeStyle = '#4CAF50';
+                ctx.strokeStyle = '#0078d4';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 
@@ -418,7 +443,7 @@
             }
             
             // Labels
-            ctx.fillStyle = '#666';
+            ctx.fillStyle = '#b0b0b0';
             ctx.font = '12px Arial';
             ctx.textAlign = 'center';
             ctx.fillText('Velocity (m/s)', canvas.width / 2, canvas.height - 5);
@@ -477,10 +502,10 @@
             isRunning = status === 'running';
             
             if (isRunning) {
-                statusEl.textContent = '🟢 Data Collection Running';
+                statusEl.textContent = 'Data Collection Running';
                 statusEl.className = 'status running';
             } else {
-                statusEl.textContent = '🔴 Data Collection Stopped';
+                statusEl.textContent = 'Data Collection Stopped';
                 statusEl.className = 'status stopped';
             }
         }
