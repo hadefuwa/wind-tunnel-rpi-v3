@@ -10,23 +10,28 @@
 ssh matrix@192.168.0.117
 ```
 
-## Quick Demo Setup Commands (Updated)
+## Quick Demo Setup Commands (No-Scroll Version)
 ```bash
 # 1. Connect to Pi
 ssh matrix@192.168.0.117
 
-# 2. Navigate to project (already cloned and updated)
+# 2. Navigate to project
 cd wind-tunnel-rpi-v3
 
 # 3. Pull latest updates
-./git-pull-update.sh
+git pull origin main
 
-# 4. Fix touchscreen scrolling
-./touchscreen-setup.sh
-
-# 5. Start demo with touchscreen support
-./start-touchscreen-demo.sh
+# 4. Start no-scroll demo (fits entire screen)
+chmod +x start-no-scroll-demo.sh
+./start-no-scroll-demo.sh
 ```
+
+## Demo Features (No-Scroll Version)
+- **Entire app fits on screen** - No scrolling required
+- **Touchscreen optimized** - Perfect for touch displays
+- **Responsive design** - Works on any screen size
+- **Compact layout** - Efficient use of screen space
+- **Professional interface** - Clean, modern design
 
 ## Demo Access URLs
 - **Local on Pi:** http://localhost:5000

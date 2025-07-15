@@ -1,5 +1,7 @@
 @echo off
-echo 🌪️  Wind Tunnel Demo - Git Push Script
+echo 🌪️  Wind Tunnel Demo -echo 🔄 For updates on Pi, run:
+echo    git pull origin main
+echo    ./start-no-scroll-demo.sht Push Script
 echo ====================================
 
 echo Initializing Git repository...
@@ -12,14 +14,15 @@ echo Adding all files...
 git add .
 
 echo Committing changes...
-git commit -m "Fix: Touchscreen text selection and Chrome extension errors
+git commit -m "Major Update: No-Scroll Responsive Design
 
-- Added advanced touchscreen fix to prevent text selection
-- Updated web app CSS to disable user-select on touch
-- Added error handling for Chrome extension conflicts
-- Improved touch scrolling behavior
-- Added quick fix script for immediate application
-- Enhanced JavaScript error handling"
+- Redesigned entire app to fit on screen without scrolling
+- Optimized layout for touchscreen displays
+- Responsive design that adapts to any screen size
+- Compact UI with efficient space utilization
+- Created start-no-scroll-demo.sh launcher
+- Enhanced user experience for touch devices
+- Eliminated need for scrolling functionality"
 
 echo Setting main branch...
 git branch -M main
