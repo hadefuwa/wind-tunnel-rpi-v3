@@ -5,10 +5,15 @@
 echo "🌪️  Wind Tunnel Demo Setup"
 echo "=========================="
 
-# Install Python dependencies
-echo "📦 Installing Python dependencies..."
-cd backend
-pip install -r requirements.txt
+# Navigate to backend directory
+cd "$(dirname "$0")/backend"
+
+# Install Python dependencies if needed
+if [ ! -f ".deps_installed" ]; then
+    echo "📦 Installing Python dependencies..."
+    pip3 install -r requirements.txt
+    touch .deps_installed
+fi
 
 # Start the demo
 echo "🚀 Starting Wind Tunnel Demo..."
@@ -25,4 +30,4 @@ echo ""
 echo "Press Ctrl+C to stop"
 echo ""
 
-python app.py
+python3 app.py
