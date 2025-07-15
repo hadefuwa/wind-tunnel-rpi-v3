@@ -44,6 +44,13 @@ def generate_realistic_data():
     return {
         'timestamp': timestamp,
         'velocity': round(velocity, 2),
+        'flowRate': round(velocity * 60.0 + random.uniform(-50, 50), 1),  # l/min
+        'diffPressure': round(velocity * 12.0 + random.uniform(-20, 20), 1),  # Pa
+        'staticPressure': round(101325 + random.uniform(-100, 100), 1),  # Pa
+        'fanSpeed': round(velocity * 150 + random.uniform(-200, 200), 0),  # RPM
+        'power': round(velocity * 8.0 + random.uniform(-10, 10), 1),  # W
+        'valvePosition': round(60 + random.uniform(-20, 20), 1),  # %
+        'dragForce': round(velocity * 0.8 + random.uniform(-0.5, 0.5), 2),  # N
         'pressure': round(pressure, 2),
         'temperature': round(temperature, 2),
         'turbulence': round(random.uniform(0, 100), 1)

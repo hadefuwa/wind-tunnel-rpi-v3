@@ -17,22 +17,26 @@
             color: #e0e0e0;
             height: 100vh;
             overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
 
         .container {
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         /* Header Section */
         .header {
             background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
-            padding: 15px 20px;
+            padding: 10px 20px;
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             position: relative;
+            flex-shrink: 0;
         }
 
         .header-content {
@@ -43,20 +47,21 @@
         }
 
         .logo {
-            height: 50px;
+            height: 40px;
             width: auto;
         }
 
         .header-text h1 {
-            font-size: 2.2em;
-            margin-bottom: 5px;
+            font-size: 1.8em;
+            margin-bottom: 3px;
             font-weight: 700;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .header-text p {
-            font-size: 1.1em;
+            font-size: 0.9em;
             opacity: 0.9;
+            margin: 0;
         }
 
         /* Navigation */
@@ -67,16 +72,18 @@
             display: flex;
             justify-content: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            flex-shrink: 0;
         }
 
         .nav-item {
-            padding: 15px 25px;
+            padding: 10px 20px;
             cursor: pointer;
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-size: 0.8em;
         }
 
         .nav-item:hover {
@@ -93,56 +100,88 @@
         /* Content Area */
         .content {
             flex: 1;
-            padding: 20px;
-            overflow-y: auto;
+            padding: 10px;
+            overflow: hidden;
             background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
         }
 
         .tab-content {
             display: none;
             height: 100%;
+            overflow: hidden;
         }
 
         .tab-content.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         /* Dashboard Tab */
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 10px;
             height: 100%;
+            overflow: hidden;
+        }
+
+        .dashboard-header {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .dashboard-left {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .dashboard-right {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
         }
 
         .card {
             background: #2a2a2a;
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 8px;
+            padding: 15px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .card h3 {
             color: #3498db;
-            margin-bottom: 15px;
-            font-size: 1.3em;
+            margin-bottom: 10px;
+            font-size: 1.1em;
             border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
+            flex-shrink: 0;
         }
 
         /* Metrics Grid */
         .metrics {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .metric {
             background: #333;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 6px;
             text-align: center;
             border: 1px solid #555;
             transition: transform 0.3s ease;
@@ -154,32 +193,32 @@
         }
 
         .metric-value {
-            font-size: 2.5em;
+            font-size: 1.4em;
             font-weight: bold;
             color: #3498db;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .metric-label {
-            font-size: 0.9em;
+            font-size: 0.7em;
             opacity: 0.8;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         /* Controls */
         .controls {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 10px;
             justify-content: center;
         }
 
         .btn {
-            padding: 12px 25px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 6px;
-            font-size: 16px;
+            border-radius: 4px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -220,18 +259,20 @@
         /* Chart Container */
         .chart-container {
             position: relative;
-            height: 400px;
+            height: 200px;
             background: #333;
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 6px;
+            padding: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex: 1;
+            overflow: hidden;
         }
 
         .chart-placeholder {
             color: #666;
-            font-size: 18px;
+            font-size: 14px;
             text-align: center;
         }
 
@@ -244,33 +285,54 @@
             position: relative;
         }
 
+        /* Tunnel Image */
+        .tunnel-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .tunnel-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #333;
+            border-radius: 6px;
+            padding: 10px;
+            overflow: hidden;
+        }
+
         /* Data Log */
         .data-log {
-            height: 300px;
+            height: 150px;
             overflow-y: auto;
             background: #333;
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 6px;
+            padding: 10px;
             border: 1px solid #555;
+            flex: 1;
         }
 
         .data-entry {
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 6px;
+            margin-bottom: 6px;
             background: #2a2a2a;
-            border-radius: 5px;
-            border-left: 4px solid #3498db;
+            border-radius: 4px;
+            border-left: 3px solid #3498db;
         }
 
         .data-timestamp {
             color: #3498db;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
+            font-size: 0.8em;
         }
 
         .data-values {
             color: #bbb;
-            font-size: 0.9em;
+            font-size: 0.7em;
         }
 
         /* Wind Tunnel Simulation */
@@ -333,22 +395,34 @@
                 grid-template-columns: 1fr;
             }
             
-            .nav-item {
-                padding: 10px 15px;
-                font-size: 0.9em;
-            }
-            
-            .header-text h1 {
-                font-size: 1.8em;
+            .dashboard-left, .dashboard-right {
+                grid-column: 1 / -1;
             }
             
             .metrics {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .nav-item {
+                padding: 8px 12px;
+                font-size: 0.7em;
+            }
+            
+            .header-text h1 {
+                font-size: 1.5em;
             }
             
             .controls {
                 flex-direction: column;
                 align-items: center;
+            }
+            
+            .card {
+                padding: 10px;
+            }
+            
+            .chart-container {
+                height: 150px;
             }
         }
 
@@ -421,7 +495,6 @@
         <!-- Navigation -->
         <div class="nav">
             <div class="nav-item active" onclick="showTab('dashboard')">Dashboard</div>
-            <div class="nav-item" onclick="showTab('simulation')">Simulation</div>
             <div class="nav-item" onclick="showTab('graphs')">Graphs/Data</div>
             <div class="nav-item" onclick="showTab('settings')">Settings</div>
         </div>
@@ -430,61 +503,77 @@
         <div class="content">
             <!-- Dashboard Tab -->
             <div id="dashboard" class="tab-content active">
-                <div class="controls">
-                    <button class="btn btn-start" onclick="startCollection()">Start Collection</button>
-                    <button class="btn btn-stop" onclick="stopCollection()">Stop Collection</button>
-                    <button class="btn btn-mode" onclick="toggleMode()">Mode: <span id="mode-display">Simulation</span></button>
-                </div>
-
-                <div class="metrics">
-                    <div class="metric">
-                        <div class="metric-value" id="velocity-display">0.0</div>
-                        <div class="metric-label">Velocity (m/s)</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value" id="pressure-display">0.0</div>
-                        <div class="metric-label">Pressure (kPa)</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value" id="temperature-display">0.0</div>
-                        <div class="metric-label">Temperature (°C)</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-value" id="turbulence-display">0.0</div>
-                        <div class="metric-label">Turbulence (%)</div>
-                    </div>
-                </div>
-
                 <div class="dashboard">
-                    <div class="card">
-                        <h3>Wind Tunnel Simulation</h3>
-                        <div class="simulation-container">
-                            <canvas id="simulationCanvas" class="simulation-canvas"></canvas>
-                            <div class="simulation-overlay">
-                                <div class="simulation-stat">Wind Speed: <span id="sim-velocity">0.0</span> m/s</div>
-                                <div class="simulation-stat">Particles: <span id="sim-particles">0</span></div>
+                    <div class="dashboard-header">
+                        <div class="controls">
+                            <button class="btn btn-start" onclick="startCollection()">Start Collection</button>
+                            <button class="btn btn-stop" onclick="stopCollection()">Stop Collection</button>
+                            <button class="btn btn-mode" onclick="toggleMode()">Mode: <span id="mode-display">Simulation</span></button>
+                        </div>
+
+                        <div class="metrics">
+                            <div class="metric">
+                                <div class="metric-value" id="velocity-display">0.0</div>
+                                <div class="metric-label">Velocity (m/s)</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value" id="flow-rate-display">0.0</div>
+                                <div class="metric-label">Flow Rate (l/min)</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value" id="diff-pressure-display">0.0</div>
+                                <div class="metric-label">Diff Pressure (Pa)</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value" id="static-pressure-display">0.0</div>
+                                <div class="metric-label">Static Pressure (Pa)</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value" id="fan-speed-display">0.0</div>
+                                <div class="metric-label">Fan Speed (RPM)</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value" id="power-display">0.0</div>
+                                <div class="metric-label">Power (W)</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value" id="valve-position-display">0.0</div>
+                                <div class="metric-label">Valve Position (%)</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value" id="drag-force-display">0.0</div>
+                                <div class="metric-label">Drag Force (N)</div>
                             </div>
                         </div>
                     </div>
-                    <div class="card">
-                        <h3>Recent Data</h3>
-                        <div id="data-log" class="data-log">
-                            <p style="opacity: 0.7; text-align: center; margin-top: 100px;">No data yet...</p>
+
+                    <div class="dashboard-left">
+                        <div class="card">
+                            <h3>Wind Tunnel</h3>
+                            <div class="tunnel-container">
+                                <img src="tunnel.png" alt="Wind Tunnel" class="tunnel-image" onerror="this.style.display='none'">
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>Velocity Chart</h3>
+                            <div class="chart-container">
+                                <canvas id="velocityChart" class="simple-chart"></canvas>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Simulation Tab -->
-            <div id="simulation" class="tab-content">
-                <div class="card">
-                    <h3>Wind Tunnel Simulation</h3>
-                    <div class="simulation-container">
-                        <canvas id="simulationCanvas2" class="simulation-canvas"></canvas>
-                        <div class="simulation-overlay">
-                            <div class="simulation-stat">Wind Speed: <span id="sim-velocity2">0.0</span> m/s</div>
-                            <div class="simulation-stat">Particles: <span id="sim-particles2">0</span></div>
-                            <div class="simulation-stat">Turbulence: <span id="sim-turbulence2">0.0</span>%</div>
+                    <div class="dashboard-right">
+                        <div class="card">
+                            <h3>Pressure Chart</h3>
+                            <div class="chart-container">
+                                <canvas id="pressureChart" class="simple-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>Recent Data</h3>
+                            <div id="data-log" class="data-log">
+                                <p style="opacity: 0.7; text-align: center; margin-top: 50px;">No data yet...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -492,29 +581,41 @@
 
             <!-- Graphs/Data Tab -->
             <div id="graphs" class="tab-content">
-                <div class="dashboard">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; height: 100%; overflow: hidden;">
                     <div class="card">
                         <h3>Velocity Over Time</h3>
                         <div class="chart-container">
-                            <canvas id="velocityChart" class="simple-chart"></canvas>
+                            <canvas id="velocityChart2" class="simple-chart"></canvas>
                         </div>
                     </div>
                     <div class="card">
-                        <h3>Pressure Over Time</h3>
+                        <h3>Flow Rate Over Time</h3>
                         <div class="chart-container">
-                            <canvas id="pressureChart" class="simple-chart"></canvas>
+                            <canvas id="flowRateChart" class="simple-chart"></canvas>
                         </div>
                     </div>
                     <div class="card">
-                        <h3>Temperature Over Time</h3>
+                        <h3>Pressure Comparison</h3>
                         <div class="chart-container">
-                            <canvas id="temperatureChart" class="simple-chart"></canvas>
+                            <canvas id="pressureChart2" class="simple-chart"></canvas>
                         </div>
                     </div>
                     <div class="card">
-                        <h3>Multi-Parameter View</h3>
+                        <h3>Fan Speed & Power</h3>
                         <div class="chart-container">
-                            <canvas id="multiChart" class="simple-chart"></canvas>
+                            <canvas id="fanPowerChart" class="simple-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Valve Position</h3>
+                        <div class="chart-container">
+                            <canvas id="valveChart" class="simple-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Drag Force</h3>
+                        <div class="chart-container">
+                            <canvas id="dragChart" class="simple-chart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -766,9 +867,13 @@
         // Update UI
         function updateMetrics(data) {
             document.getElementById('velocity-display').textContent = data.velocity || '0.0';
-            document.getElementById('pressure-display').textContent = data.pressure || '0.0';
-            document.getElementById('temperature-display').textContent = data.temperature || '0.0';
-            document.getElementById('turbulence-display').textContent = data.turbulence || '0.0';
+            document.getElementById('flow-rate-display').textContent = data.flowRate || '0.0';
+            document.getElementById('diff-pressure-display').textContent = data.diffPressure || '0.0';
+            document.getElementById('static-pressure-display').textContent = data.staticPressure || '0.0';
+            document.getElementById('fan-speed-display').textContent = data.fanSpeed || '0.0';
+            document.getElementById('power-display').textContent = data.power || '0.0';
+            document.getElementById('valve-position-display').textContent = data.valvePosition || '0.0';
+            document.getElementById('drag-force-display').textContent = data.dragForce || '0.0';
             
             // Update simulation overlay
             document.getElementById('sim-velocity').textContent = data.velocity || '0.0';
@@ -790,36 +895,46 @@
             entry.innerHTML = `
                 <div class="data-timestamp">${timestamp}</div>
                 <div class="data-values">
-                    V: ${data.velocity} m/s | P: ${data.pressure} kPa | T: ${data.temperature}°C | Turb: ${data.turbulence}%
+                    V: ${data.velocity} m/s | FR: ${data.flowRate} l/min | DP: ${data.diffPressure} Pa | SP: ${data.staticPressure} Pa<br>
+                    Fan: ${data.fanSpeed} RPM | Power: ${data.power} W | Valve: ${data.valvePosition}% | Drag: ${data.dragForce} N
                 </div>
             `;
             
             logEl.insertBefore(entry, logEl.firstChild);
             
             // Limit log entries
-            while (logEl.children.length > 20) {
+            while (logEl.children.length > 15) {
                 logEl.removeChild(logEl.lastChild);
             }
         }
 
         function updateCharts(data) {
             dataBuffer.push(data);
-            if (dataBuffer.length > 50) {
+            if (dataBuffer.length > 30) {
                 dataBuffer.shift();
             }
             
             // Extract data for charts
             const velocityData = dataBuffer.map(d => d.velocity);
-            const pressureData = dataBuffer.map(d => d.pressure);
-            const temperatureData = dataBuffer.map(d => d.temperature);
+            const flowRateData = dataBuffer.map(d => d.flowRate);
+            const diffPressureData = dataBuffer.map(d => d.diffPressure);
+            const staticPressureData = dataBuffer.map(d => d.staticPressure);
+            const fanSpeedData = dataBuffer.map(d => d.fanSpeed);
+            const powerData = dataBuffer.map(d => d.power);
+            const valveData = dataBuffer.map(d => d.valvePosition);
+            const dragData = dataBuffer.map(d => d.dragForce);
             
-            // Draw charts
+            // Dashboard charts
             drawSimpleChart('velocityChart', velocityData, 'Velocity (m/s)', '#3498db');
-            drawSimpleChart('pressureChart', pressureData, 'Pressure (kPa)', '#e74c3c');
-            drawSimpleChart('temperatureChart', temperatureData, 'Temperature (°C)', '#f39c12');
+            drawSimpleChart('pressureChart', diffPressureData, 'Diff Pressure (Pa)', '#e74c3c');
             
-            // Multi-parameter chart (just show velocity for now)
-            drawSimpleChart('multiChart', velocityData, 'Multi-Parameter View', '#3498db');
+            // Graphs tab charts
+            drawSimpleChart('velocityChart2', velocityData, 'Velocity (m/s)', '#3498db');
+            drawSimpleChart('flowRateChart', flowRateData, 'Flow Rate (l/min)', '#2ecc71');
+            drawSimpleChart('pressureChart2', diffPressureData, 'Diff Pressure (Pa)', '#e74c3c');
+            drawSimpleChart('fanPowerChart', fanSpeedData, 'Fan Speed (RPM)', '#f39c12');
+            drawSimpleChart('valveChart', valveData, 'Valve Position (%)', '#9b59b6');
+            drawSimpleChart('dragChart', dragData, 'Drag Force (N)', '#e67e22');
         }
 
         // Data fetching with better error handling

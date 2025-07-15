@@ -47,11 +47,32 @@ sudo pkill -f chromium-browser
 sudo pkill -f firefox
 ```
 
+## 🔄 **Recommended Workflow**
+
+**Windows PC (Development)** → **GitHub** → **Raspberry Pi (Deployment)**
+
+### On Your Windows PC:
+1. Make all code changes
+2. Test locally if possible
+3. Commit and push to GitHub
+
+### On Your Raspberry Pi:
+1. Pull latest changes from GitHub
+2. Update dependencies if needed
+3. Make scripts executable
+4. Test the application
+
 ### Step 4: Pull Latest Changes
 
 ```bash
-# Fetch and pull the latest changes from GitHub
+# First, reset any local changes (usually just file permissions)
+git reset --hard origin/main
+
+# Then pull the latest changes from GitHub
 git pull origin main
+
+# Make scripts executable (they lose permissions after reset)
+chmod +x *.sh
 
 # Check if update was successful
 git status
@@ -191,13 +212,15 @@ After creating the update script, you can update with just:
 # Check for local changes
 git status
 
-# If there are local changes, stash them
+# If there are local changes (usually just file permissions), reset to remote
+git reset --hard origin/main
+
+# Make scripts executable again
+chmod +x *.sh
+
+# Or if you want to save local changes, stash them
 git stash
-
-# Try pulling again
 git pull origin main
-
-# Apply stashed changes if needed
 git stash pop
 ```
 
