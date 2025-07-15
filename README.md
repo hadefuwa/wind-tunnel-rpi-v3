@@ -2,7 +2,7 @@
 
 A lightweight web-based wind tunnel data acquisition system for Raspberry Pi with real-time visualization and SPI sensor integration.
 
-## 🚀 Quick Demo Setup (For Tomorrow's Presentation)
+## 🚀 Quick Demo Setup 
 
 ### Prerequisites on Raspberry Pi
 ```bash
