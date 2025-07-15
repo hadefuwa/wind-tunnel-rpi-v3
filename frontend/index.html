@@ -550,9 +550,6 @@
             height: 100%;
             padding: 20px;
             box-sizing: border-box;
-            transform: scale(0.85);
-            transform-origin: center;
-            overflow: hidden;
         }
 
         .graphs-grid .card {
@@ -565,6 +562,84 @@
             flex: 1;
             min-height: 0; /* Allow flex items to shrink */
         }
+
+        /* Chart Zoom Controls */
+        .chart-zoom-applied {
+            transition: transform 0.3s ease;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #2c3e50;
+            border-radius: 6px;
+        }
+
+        .settings-label {
+            color: #ecf0f1;
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .settings-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .zoom-slider {
+            width: 200px;
+            height: 6px;
+            background: #34495e;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .zoom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #3498db;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #2980b9;
+        }
+
+        .zoom-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #3498db;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #2980b9;
+        }
+
+        .zoom-value {
+            color: #3498db;
+            font-weight: bold;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .zoom-reset {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .zoom-reset:hover {
+            background: #c0392b;
+        }
+
     </style>
 </head>
 <body>
@@ -713,6 +788,22 @@
             <div id="settings" class="tab-content">
                 <div class="settings-grid">
                     <div class="setting-group">
+                        <h4>Chart Display Settings</h4>
+                        <div class="setting-item">
+                            <label>Chart Zoom Level: <span id="chart-zoom-value">100%</span></label>
+                            <input type="range" id="chart-zoom-slider" min="50" max="150" step="5" value="100" 
+                                   style="width: 200px; margin-top: 10px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #888; margin-top: 5px;">
+                                <span>50%</span>
+                                <span>100%</span>
+                                <span>150%</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <button id="reset-zoom" class="btn btn-mode" style="margin-top: 10px;">Reset to Default</button>
+                        </div>
+                    </div>
+                    <div class="setting-group">
                         <h4>System Status</h4>
                         <div class="setting-item">
                             <label>Connection Status</label>
@@ -752,6 +843,17 @@
                             <div style="padding: 10px; background: #333; border-radius: 4px;">
                                 <div id="backendStatus">Checking connection...</div>
                                 <button class="btn btn-mode" onclick="testConnection()" style="margin-top: 10px;">Test Connection</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <h4>Chart Display Settings</h4>
+                        <div class="settings-row">
+                            <span class="settings-label">Chart Zoom Level</span>
+                            <div class="settings-control">
+                                <input type="range" id="chartZoomSlider" class="zoom-slider" min="0.5" max="2.0" step="0.1" value="1.0">
+                                <span class="zoom-value" id="chartZoomValue">1.0x</span>
+                                <button class="zoom-reset" onclick="resetChartZoom()">Reset</button>
                             </div>
                         </div>
                     </div>
@@ -799,6 +901,64 @@
         let dataBuffer = [];
         let charts = {};
         let connectionStatus = false;
+
+        // Chart zoom functionality
+        let chartZoomLevel = 100;
+        const ZOOM_SETTINGS_KEY = 'windTunnelChartZoom';
+
+        // Load saved zoom setting
+        function loadZoomSetting() {
+            const saved = localStorage.getItem(ZOOM_SETTINGS_KEY);
+            if (saved) {
+                chartZoomLevel = parseInt(saved);
+                const slider = document.getElementById('chart-zoom-slider');
+                const value = document.getElementById('chart-zoom-value');
+                if (slider) slider.value = chartZoomLevel;
+                if (value) value.textContent = chartZoomLevel + '%';
+            }
+        }
+
+        // Save zoom setting
+        function saveZoomSetting() {
+            localStorage.setItem(ZOOM_SETTINGS_KEY, chartZoomLevel.toString());
+        }
+
+        // Apply zoom to all charts
+        function applyChartZoom() {
+            const chartContainers = document.querySelectorAll('.chart-container');
+            chartContainers.forEach(container => {
+                const scale = chartZoomLevel / 100;
+                container.style.transform = `scale(${scale})`;
+                container.style.transformOrigin = 'center';
+                container.classList.add('chart-zoom-applied');
+            });
+        }
+
+        // Initialize zoom controls
+        function initZoomControls() {
+            const slider = document.getElementById('chart-zoom-slider');
+            const value = document.getElementById('chart-zoom-value');
+            const resetBtn = document.getElementById('reset-zoom');
+
+            if (slider) {
+                slider.addEventListener('input', (e) => {
+                    chartZoomLevel = parseInt(e.target.value);
+                    if (value) value.textContent = chartZoomLevel + '%';
+                    applyChartZoom();
+                    saveZoomSetting();
+                });
+            }
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    chartZoomLevel = 100;
+                    if (slider) slider.value = 100;
+                    if (value) value.textContent = '100%';
+                    applyChartZoom();
+                    saveZoomSetting();
+                });
+            }
+        }
 
         // Professional chart implementation
         function drawSimpleChart(canvasId, data, label, color) {
@@ -1316,6 +1476,11 @@
             drawSimpleChart('pressureChart2', diffPressureData, 'Diff Pressure (Pa)', '#e74c3c');
             drawSimpleChart('fanPowerChart', fanSpeedData, 'Fan Speed (RPM)', '#f39c12');
             
+            // Apply zoom to charts after drawing
+            setTimeout(() => {
+                applyChartZoom();
+            }, 50);
+            
             // Debug logging
             console.log('Chart data updated:', {
                 velocity: velocityData.slice(-3),
@@ -1594,17 +1759,6 @@
             carGroup.rotation.y = Math.PI; // Face the car forward
             
             carModel = carGroup;
-            scene.add(carModel);
-        }
-
-        function setupLighting() {
-            // Enhanced ambient lighting
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
-            scene.add(ambientLight);
-
-            // Main directional light
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(5, 5, 5);
             directionalLight.castShadow = true;
             directionalLight.shadow.mapSize.width = 2048;
             directionalLight.shadow.mapSize.height = 2048;
@@ -1852,8 +2006,17 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Application starting...');
             
+            // Initialize zoom controls and load saved settings
+            loadZoomSetting();
+            initZoomControls();
+            
             // Initialize charts with sample data
             initializeCharts();
+            
+            // Apply zoom after charts are initialized
+            setTimeout(() => {
+                applyChartZoom();
+            }, 500);
             
             // Initialize WebGL visualization
             setTimeout(initWebGL, 100);
@@ -1878,6 +2041,8 @@
                         const lastData = dataBuffer[dataBuffer.length - 1];
                         updateCharts(lastData);
                     }
+                    // Reapply zoom after resize
+                    applyChartZoom();
                 }, 100);
             });
         });
