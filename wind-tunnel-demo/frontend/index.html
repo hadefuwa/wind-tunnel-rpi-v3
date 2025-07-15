@@ -48,6 +48,56 @@
             background: #1a1a1a;
         }
 
+        /* Navigation Menu */
+        .nav-menu {
+            display: flex;
+            background: #2a2a2a;
+            border: 1px solid #333;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            height: 50px;
+        }
+
+        .nav-item {
+            flex: 1;
+            background: #333;
+            color: #e0e0e0;
+            border: none;
+            padding: 12px 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-right: 1px solid #555;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+
+        .nav-item:last-child {
+            border-right: none;
+        }
+
+        .nav-item:hover {
+            background: #444;
+        }
+
+        .nav-item.active {
+            background: #0078d4;
+            color: white;
+        }
+
+        /* Page Content */
+        .page {
+            display: none;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+        }
+
         .header {
             text-align: center;
             color: #ffffff;
@@ -321,43 +371,163 @@
             System Ready
         </div>
 
-        <div class="controls">
-            <button class="btn btn-start" onclick="startCollection()">Start Collection</button>
-            <button class="btn btn-stop" onclick="stopCollection()">Stop Collection</button>
-            <button class="btn btn-mode" onclick="toggleMode()">Mode: <span id="mode-display">Simulation</span></button>
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <button class="nav-item active" onclick="showPage('dashboard')">Dashboard</button>
+            <button class="nav-item" onclick="showPage('simulation')">2D Simulation</button>
+            <button class="nav-item" onclick="showPage('graphs')">Graphs</button>
+            <button class="nav-item" onclick="showPage('settings')">Settings</button>
         </div>
 
-        <div class="metrics">
-            <div class="metric">
-                <div class="metric-value" id="velocity-display">0.0</div>
-                <div class="metric-label">Velocity (m/s)</div>
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+            <div class="controls">
+                <button class="btn btn-start" onclick="startCollection()">Start Collection</button>
+                <button class="btn btn-stop" onclick="stopCollection()">Stop Collection</button>
+                <button class="btn btn-mode" onclick="toggleMode()">Mode: <span id="mode-display">Simulation</span></button>
             </div>
-            <div class="metric">
-                <div class="metric-value" id="pressure-display">0.0</div>
-                <div class="metric-label">Pressure (kPa)</div>
-            </div>
-            <div class="metric">
-                <div class="metric-value" id="temperature-display">0.0</div>
-                <div class="metric-label">Temperature (°C)</div>
-            </div>
-            <div class="metric">
-                <div class="metric-value" id="turbulence-display">0.0</div>
-                <div class="metric-label">Turbulence (%)</div>
-            </div>
-        </div>
 
-        <div class="dashboard">
-            <div class="card">
-                <h3 style="margin-bottom: 10px; font-size: 1.1em;">Real-time Chart</h3>
-                <canvas id="chart" class="chart"></canvas>
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value" id="velocity-display">0.0</div>
+                    <div class="metric-label">Velocity (m/s)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="pressure-display">0.0</div>
+                    <div class="metric-label">Pressure (kPa)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="efficiency-display">0.0</div>
+                    <div class="metric-label">Efficiency (%)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="turbulence-display">0.0</div>
+                    <div class="metric-label">Turbulence (%)</div>
+                </div>
             </div>
-            <div class="card">
-                <h3 style="margin-bottom: 10px; font-size: 1.1em;">Recent Data</h3>
-                <div id="data-log" class="data-log">
-                    <p style="opacity: 0.7;">No data yet...</p>
+
+            <div class="dashboard">
+                <div class="card">
+                    <h3 style="margin-bottom: 10px; font-size: 1.1em;">Real-time Chart</h3>
+                    <canvas id="chart" class="chart"></canvas>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom: 10px; font-size: 1.1em;">Recent Data</h3>
+                    <div id="data-log" class="data-log">
+                        <p style="opacity: 0.7;">No data yet...</p>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- 2D Simulation Page -->
+        <div id="simulation" class="page">
+            <div class="card" style="height: 100%;">
+                <h3 style="margin-bottom: 10px; font-size: 1.1em;">2D Wind Tunnel Simulation</h3>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button class="btn btn-mode" onclick="startSimulation()">Start Simulation</button>
+                    <button class="btn btn-stop" onclick="stopSimulation()">Stop Simulation</button>
+                    <button class="btn btn-mode" onclick="resetSimulation()">Reset</button>
+                </div>
+                <canvas id="simulation-canvas" style="width: 100%; height: calc(100% - 60px); border: 1px solid #555; background: #333;"></canvas>
+            </div>
+        </div>
+
+        <!-- Graphs Page -->
+        <div id="graphs" class="page">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; height: 100%;">
+                <div class="card">
+                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Velocity vs Time</h4>
+                    <canvas id="graph1" class="chart"></canvas>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Pressure vs Time</h4>
+                    <canvas id="graph2" class="chart"></canvas>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Turbulence vs Time</h4>
+                    <canvas id="graph3" class="chart"></canvas>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Efficiency vs Time</h4>
+                    <canvas id="graph4" class="chart"></canvas>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Flow Rate vs Time</h4>
+                    <canvas id="graph5" class="chart"></canvas>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Power vs Time</h4>
+                    <canvas id="graph6" class="chart"></canvas>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Reynolds Number</h4>
+                    <canvas id="graph7" class="chart"></canvas>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Drag Coefficient</h4>
+                    <canvas id="graph8" class="chart"></canvas>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 5px; font-size: 0.9em;">Lift Coefficient</h4>
+                    <canvas id="graph9" class="chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings" class="page">
+            <div class="card" style="height: 100%;">
+                <h3 style="margin-bottom: 15px; font-size: 1.1em;">System Settings</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: calc(100% - 40px);">
+                    <div>
+                        <h4 style="margin-bottom: 10px; color: #ffffff;">Data Collection</h4>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Sample Rate (Hz)</label>
+                            <input type="number" id="sample-rate" value="10" min="1" max="100" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Data Buffer Size</label>
+                            <input type="number" id="buffer-size" value="1000" min="100" max="10000" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Auto-Export</label>
+                            <select id="auto-export" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
+                                <option value="disabled">Disabled</option>
+                                <option value="hourly">Hourly</option>
+                                <option value="daily">Daily</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="margin-bottom: 10px; color: #ffffff;">Display Settings</h4>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Theme</label>
+                            <select id="theme" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
+                                <option value="dark">Dark</option>
+                                <option value="light">Light</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Chart Update Rate (ms)</label>
+                            <input type="number" id="chart-rate" value="1000" min="100" max="5000" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #b0b0b0;">Alert Threshold</label>
+                            <input type="number" id="alert-threshold" value="90" min="0" max="100" style="width: 100%; padding: 8px; background: #333; border: 1px solid #555; color: #fff;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-start" onclick="saveSettings()">Save Settings</button>
+                    <button class="btn btn-mode" onclick="resetSettings()">Reset to Default</button>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 
     <script>
@@ -514,8 +684,175 @@
         function updateMetrics(data) {
             document.getElementById('velocity-display').textContent = data.velocity || '0.0';
             document.getElementById('pressure-display').textContent = data.pressure || '0.0';
-            document.getElementById('temperature-display').textContent = data.temperature || '0.0';
+            document.getElementById('efficiency-display').textContent = data.efficiency || '0.0';
             document.getElementById('turbulence-display').textContent = data.turbulence || '0.0';
+        }
+
+        // Navigation functions
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Reinitialize charts when switching pages
+            if (pageId === 'dashboard') {
+                setTimeout(() => {
+                    if (chart) {
+                        chart.canvas.width = chart.canvas.offsetWidth;
+                        chart.canvas.height = chart.canvas.offsetHeight;
+                        drawChart();
+                    }
+                }, 100);
+            } else if (pageId === 'graphs') {
+                setTimeout(() => initGraphs(), 100);
+            } else if (pageId === 'simulation') {
+                setTimeout(() => initSimulation(), 100);
+            }
+        }
+
+        // Initialize 9 graphs
+        function initGraphs() {
+            for (let i = 1; i <= 9; i++) {
+                const canvas = document.getElementById(`graph${i}`);
+                if (canvas) {
+                    canvas.width = canvas.offsetWidth;
+                    canvas.height = canvas.offsetHeight;
+                    drawMiniChart(canvas, i);
+                }
+            }
+        }
+
+        // Draw mini charts for graphs page
+        function drawMiniChart(canvas, chartIndex) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Generate sample data based on chart index
+            const data = [];
+            for (let i = 0; i < 20; i++) {
+                data.push(Math.sin(i * 0.3 + chartIndex) * 50 + 50 + Math.random() * 20);
+            }
+            
+            // Draw simple line chart
+            ctx.strokeStyle = '#0078d4';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            data.forEach((value, index) => {
+                const x = (index / (data.length - 1)) * canvas.width;
+                const y = canvas.height - (value / 100) * canvas.height;
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            
+            ctx.stroke();
+        }
+
+        // Initialize 2D simulation
+        function initSimulation() {
+            const canvas = document.getElementById('simulation-canvas');
+            if (!canvas) return;
+            
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw wind tunnel outline
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
+            
+            // Draw airflow lines
+            ctx.strokeStyle = '#0078d4';
+            ctx.lineWidth = 1;
+            
+            for (let y = 70; y < canvas.height - 70; y += 20) {
+                ctx.beginPath();
+                ctx.moveTo(60, y);
+                ctx.lineTo(canvas.width - 60, y);
+                ctx.stroke();
+                
+                // Add arrows
+                for (let x = 80; x < canvas.width - 80; x += 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x - 5, y - 3);
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x - 5, y + 3);
+                    ctx.stroke();
+                }
+            }
+            
+            // Draw test object (rectangle)
+            ctx.fillStyle = '#d83b01';
+            ctx.fillRect(canvas.width / 2 - 20, canvas.height / 2 - 30, 40, 60);
+        }
+
+        // Simulation controls
+        function startSimulation() {
+            console.log('Starting 2D simulation...');
+            // Add simulation logic here
+        }
+
+        function stopSimulation() {
+            console.log('Stopping 2D simulation...');
+            // Add stop logic here
+        }
+
+        function resetSimulation() {
+            console.log('Resetting 2D simulation...');
+            initSimulation();
+        }
+
+        // Settings functions
+        function saveSettings() {
+            const settings = {
+                sampleRate: document.getElementById('sample-rate').value,
+                bufferSize: document.getElementById('buffer-size').value,
+                autoExport: document.getElementById('auto-export').value,
+                theme: document.getElementById('theme').value,
+                chartRate: document.getElementById('chart-rate').value,
+                alertThreshold: document.getElementById('alert-threshold').value
+            };
+            
+            localStorage.setItem('windTunnelSettings', JSON.stringify(settings));
+            alert('Settings saved successfully!');
+        }
+
+        function resetSettings() {
+            document.getElementById('sample-rate').value = '10';
+            document.getElementById('buffer-size').value = '1000';
+            document.getElementById('auto-export').value = 'disabled';
+            document.getElementById('theme').value = 'dark';
+            document.getElementById('chart-rate').value = '1000';
+            document.getElementById('alert-threshold').value = '90';
+            
+            localStorage.removeItem('windTunnelSettings');
+            alert('Settings reset to default!');
+        }
+
+        // Load settings on page load
+        function loadSettings() {
+            const settings = localStorage.getItem('windTunnelSettings');
+            if (settings) {
+                const parsed = JSON.parse(settings);
+                document.getElementById('sample-rate').value = parsed.sampleRate || '10';
+                document.getElementById('buffer-size').value = parsed.bufferSize || '1000';
+                document.getElementById('auto-export').value = parsed.autoExport || 'disabled';
+                document.getElementById('theme').value = parsed.theme || 'dark';
+                document.getElementById('chart-rate').value = parsed.chartRate || '1000';
+                document.getElementById('alert-threshold').value = parsed.alertThreshold || '90';
+            }
         }
 
         function updateDataLog(data) {
@@ -528,7 +865,7 @@
             entry.style.color = '#e0e0e0';
             entry.innerHTML = `
                 <strong style="color: #ffffff;">${timestamp}</strong><br>
-                <span style="color: #b0b0b0;">V: ${data.velocity} m/s | P: ${data.pressure} kPa | T: ${data.temperature}°C</span>
+                <span style="color: #b0b0b0;">V: ${data.velocity} m/s | P: ${data.pressure} kPa | E: ${data.efficiency}%</span>
             `;
             
             logEl.insertBefore(entry, logEl.firstChild);
@@ -591,6 +928,7 @@
             });
             
             initChart();
+            loadSettings();
             
             // Auto-start for demo
             setTimeout(startCollection, 1000);
@@ -611,6 +949,18 @@
                 chart.canvas.width = chart.canvas.offsetWidth;
                 chart.canvas.height = chart.canvas.offsetHeight;
                 drawChart();
+            }
+            
+            // Resize graphs if on graphs page
+            const graphsPage = document.getElementById('graphs');
+            if (graphsPage.classList.contains('active')) {
+                setTimeout(() => initGraphs(), 100);
+            }
+            
+            // Resize simulation if on simulation page
+            const simulationPage = document.getElementById('simulation');
+            if (simulationPage.classList.contains('active')) {
+                setTimeout(() => initSimulation(), 100);
             }
         });
     </script>

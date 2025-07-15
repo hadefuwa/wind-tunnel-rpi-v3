@@ -38,14 +38,15 @@ def generate_realistic_data():
     # Simulate pressure differential
     pressure = 101.3 + (velocity * 0.5) + random.uniform(-0.5, 0.5)
     
-    # Simulate temperature (affected by airflow)
-    temperature = 23.0 + (velocity * 0.1) + random.uniform(-1.0, 1.0)
+    # Calculate efficiency based on velocity and pressure
+    efficiency = min(95.0, (velocity / 20.0) * 100 + random.uniform(-5.0, 5.0))
+    efficiency = max(0.0, efficiency)
     
     return {
         'timestamp': timestamp,
         'velocity': round(velocity, 2),
         'pressure': round(pressure, 2),
-        'temperature': round(temperature, 2),
+        'efficiency': round(efficiency, 1),
         'turbulence': round(random.uniform(0, 100), 1)
     }
 
@@ -82,12 +83,24 @@ data_thread.start()
 @app.route('/')
 def index():
     """Serve the demo frontend"""
-    return render_template_string(open('../frontend/index.html').read())
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    frontend_dir = os.path.join(script_dir, '..', 'frontend')
+    html_file = os.path.join(frontend_dir, 'index.html')
+    
+    try:
+        with open(html_file, 'r') as f:
+            return render_template_string(f.read())
+    except FileNotFoundError:
+        return f"Error: Could not find {html_file}", 404
 
 @app.route('/logo.png')
 def serve_logo():
     """Serve the logo file"""
-    return send_from_directory('../frontend', 'logo.png')
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    frontend_dir = os.path.join(script_dir, '..', 'frontend')
+    return send_from_directory(frontend_dir, 'logo.png')
 
 @app.route('/api/start', methods=['POST'])
 def start_collection():
@@ -149,6 +162,19 @@ if __name__ == '__main__':
     print("📊 Management Demo Mode")
     print("🔗 Open: http://localhost:5000")
     print("🚀 Starting in simulation mode...")
+    
+    # Debug path information
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    frontend_dir = os.path.join(script_dir, '..', 'frontend')
+    html_file = os.path.join(frontend_dir, 'index.html')
+    logo_file = os.path.join(frontend_dir, 'logo.png')
+    
+    print(f"📁 Script directory: {script_dir}")
+    print(f"📁 Frontend directory: {frontend_dir}")
+    print(f"📄 HTML file: {html_file}")
+    print(f"🖼️  Logo file: {logo_file}")
+    print(f"✅ HTML exists: {os.path.exists(html_file)}")
+    print(f"✅ Logo exists: {os.path.exists(logo_file)}")
     
     # Auto-start for demo
     demo_state['running'] = True
