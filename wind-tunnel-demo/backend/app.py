@@ -4,13 +4,14 @@ Minimal Wind Tunnel Demo Backend
 Quick demo for management presentation
 """
 
-from flask import Flask, jsonify, render_template_string, request
+from flask import Flask, jsonify, render_template_string, request, send_from_directory
 from flask_cors import CORS
 import random
 import time
 import math
 import threading
 import json
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -82,6 +83,11 @@ data_thread.start()
 def index():
     """Serve the demo frontend"""
     return render_template_string(open('../frontend/index.html').read())
+
+@app.route('/logo.png')
+def serve_logo():
+    """Serve the logo file"""
+    return send_from_directory('../frontend', 'logo.png')
 
 @app.route('/api/start', methods=['POST'])
 def start_collection():

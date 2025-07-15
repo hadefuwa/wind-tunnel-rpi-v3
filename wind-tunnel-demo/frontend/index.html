@@ -244,10 +244,11 @@
             flex: 1;
             min-height: 0;
             overflow-y: auto;
-            background: #f8f9fa;
-            border-radius: 6px;
+            background: #333;
+            border: 1px solid #555;
             padding: 8px;
             font-size: 0.8em;
+            color: #e0e0e0;
         }
 
         @media (max-width: 768px) {
@@ -323,7 +324,7 @@
         <div class="controls">
             <button class="btn btn-start" onclick="startCollection()">Start Collection</button>
             <button class="btn btn-stop" onclick="stopCollection()">Stop Collection</button>
-            <button class="btn btn-mode" onclick="toggleMode()">🔧 Mode: <span id="mode-display">Simulation</span></button>
+            <button class="btn btn-mode" onclick="toggleMode()">Mode: <span id="mode-display">Simulation</span></button>
         </div>
 
         <div class="metrics">
@@ -351,7 +352,7 @@
                 <canvas id="chart" class="chart"></canvas>
             </div>
             <div class="card">
-                <h3 style="margin-bottom: 10px; font-size: 1.1em;">📋 Recent Data</h3>
+                <h3 style="margin-bottom: 10px; font-size: 1.1em;">Recent Data</h3>
                 <div id="data-log" class="data-log">
                     <p style="opacity: 0.7;">No data yet...</p>
                 </div>
@@ -523,10 +524,11 @@
             
             const entry = document.createElement('div');
             entry.style.padding = '5px 0';
-            entry.style.borderBottom = '1px solid #eee';
+            entry.style.borderBottom = '1px solid #555';
+            entry.style.color = '#e0e0e0';
             entry.innerHTML = `
-                <strong>${timestamp}</strong><br>
-                V: ${data.velocity} m/s | P: ${data.pressure} kPa | T: ${data.temperature}°C
+                <strong style="color: #ffffff;">${timestamp}</strong><br>
+                <span style="color: #b0b0b0;">V: ${data.velocity} m/s | P: ${data.pressure} kPa | T: ${data.temperature}°C</span>
             `;
             
             logEl.insertBefore(entry, logEl.firstChild);
