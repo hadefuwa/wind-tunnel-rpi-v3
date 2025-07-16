@@ -2,6 +2,20 @@
 
 This document provides step-by-step instructions for updating your Wind Tunnel Demo code on the Raspberry Pi after making changes.
 
+## 🚩 Quick Update (Recommended Approach)
+
+```bash
+cd ~/wind-tunnel-rpi-v3
+git reset --hard origin/main  # Reset any local changes first
+git pull origin main
+chmod +x *.sh
+sudo systemctl restart wind-tunnel-demo.service  # If using systemd service
+# OR ./start_demo.sh  # If using manual startup
+```
+
+> ⚠️ **Note:** If you encounter issues, use the more detailed steps below instead of just the simple git pull.
+
+
 ## 📋 Prerequisites
 
 - Raspberry Pi with SSH access enabled
