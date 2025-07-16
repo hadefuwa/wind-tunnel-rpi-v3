@@ -28,32 +28,30 @@ demo_state = {
 }
 
 def generate_realistic_data():
-    """Generate realistic wind tunnel data for demo"""
+    """Generate realistic wind tunnel data for demo with minimal processing"""
     timestamp = time.time()
     
-    # Simulate airflow with some realistic patterns
+    # Use simple calculations for minimal CPU usage
+    # Base velocity varies slowly over time
     base_velocity = 15.0 + 5.0 * math.sin(timestamp * 0.1)
     velocity = base_velocity + random.uniform(-2.0, 2.0)
     
-    # Simulate pressure differential
-    pressure = 101.3 + (velocity * 0.5) + random.uniform(-0.5, 0.5)
-    
-    # Simulate temperature (affected by airflow)
-    temperature = 23.0 + (velocity * 0.1) + random.uniform(-1.0, 1.0)
+    # All other parameters are simple linear functions of velocity for efficiency
+    # This avoids complex calculations while maintaining realistic relationships
     
     return {
         'timestamp': timestamp,
         'velocity': round(velocity, 2),
         'flowRate': round(velocity * 60.0 + random.uniform(-50, 50), 1),  # l/min
         'diffPressure': round(velocity * 12.0 + random.uniform(-20, 20), 1),  # Pa
-        'staticPressure': round(101325 + random.uniform(-100, 100), 1),  # Pa
+        'staticPressure': round(101325 + velocity * 50 + random.uniform(-100, 100), 1),  # Pa
         'fanSpeed': round(velocity * 150 + random.uniform(-200, 200), 0),  # RPM
         'power': round(velocity * 8.0 + random.uniform(-10, 10), 1),  # W
-        'valvePosition': round(60 + random.uniform(-20, 20), 1),  # %
+        'valvePosition': round(60 + velocity * 2 + random.uniform(-20, 20), 1),  # %
         'dragForce': round(velocity * 0.8 + random.uniform(-0.5, 0.5), 2),  # N
-        'pressure': round(pressure, 2),
-        'temperature': round(temperature, 2),
-        'turbulence': round(random.uniform(0, 100), 1)
+        'pressure': round(101.3 + velocity * 0.5 + random.uniform(-0.5, 0.5), 2),  # kPa
+        'temperature': round(23.0 + velocity * 0.1 + random.uniform(-1.0, 1.0), 2),  # °C
+        'turbulence': round(abs(velocity - 15.0) * 10 + random.uniform(0, 20), 1)  # %
     }
 
 def data_collection_thread():
@@ -147,7 +145,10 @@ def get_data():
 def get_latest():
     """Get latest data point"""
     if demo_state['data_buffer']:
-        return jsonify(demo_state['data_buffer'][-1])
+        latest_data = demo_state['data_buffer'][-1]
+        print(f"[DEBUG] Serving latest data: {latest_data}")
+        return jsonify(latest_data)
+    print("[DEBUG] No data available in buffer")
     return jsonify({'error': 'No data available'})
 
 @app.route('/api/config', methods=['GET', 'POST'])

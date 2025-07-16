@@ -1306,19 +1306,35 @@
 
         // Update UI with error handling
         function updateMetrics(data) {
-            const elements = [
-                'velocity-display', 'flow-rate-display', 'diff-pressure-display', 'static-pressure-display',
-                'fan-speed-display', 'power-display', 'valve-position-display', 'drag-force-display'
-            ];
+            console.log('[DEBUG] updateMetrics called with data:', data);
             
-            elements.forEach(id => {
-                const element = document.getElementById(id);
+            // Map dashboard element IDs to backend data keys
+            const metricMapping = {
+                'velocity-display': 'velocity',
+                'flow-rate-display': 'flowRate',
+                'diff-pressure-display': 'diffPressure',
+                'static-pressure-display': 'staticPressure',
+                'fan-speed-display': 'fanSpeed',
+                'power-display': 'power',
+                'valve-position-display': 'valvePosition',
+                'drag-force-display': 'dragForce'
+            };
+            
+            // Update each metric display
+            Object.keys(metricMapping).forEach(elementId => {
+                const element = document.getElementById(elementId);
                 if (element) {
-                    const key = id.replace('-display', '').replace('-', '');
-                    const value = data[key] || data[id.replace('-display', '').replace('-', '')] || '0.0';
-                    element.textContent = value;
+                    const dataKey = metricMapping[elementId];
+                    const value = data[dataKey];
+                    if (value !== undefined) {
+                        element.textContent = value;
+                        console.log(`[DEBUG] Updated ${elementId} with ${dataKey}: ${value}`);
+                    } else {
+                        element.textContent = '0.0';
+                        console.warn(`[DEBUG] No data for ${dataKey}, setting to 0.0`);
+                    }
                 } else {
-                    console.warn(`Element ${id} not found`);
+                    console.warn(`[DEBUG] Element ${elementId} not found`);
                 }
             });
             
