@@ -594,41 +594,46 @@
         .graphs-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 20px;
-            height: 100%;
+            grid-template-rows: 1fr 1fr;
+            gap: 15px;
+            padding: 15px;
+            height: calc(100vh - 120px); /* Fit screen height minus header */
+            max-height: calc(100vh - 120px);
+            overflow: hidden;
         }
         
         .graph-card {
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             border: 1px solid #4a5568;
             display: flex;
             flex-direction: column;
-            min-height: 300px;
+            min-height: 0;
+            max-height: 100%;
         }
         
         .graph-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
             border-bottom: 2px solid #3498db;
+            flex-shrink: 0;
         }
         
         .graph-header h3 {
             margin: 0;
             color: #ecf0f1;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
         }
         
         .graph-value {
             color: #3498db;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             text-align: right;
         }
@@ -637,77 +642,102 @@
             flex: 1;
             background: #1a252f;
             border-radius: 10px;
-            padding: 15px;
+            padding: 10px;
             position: relative;
             overflow: hidden;
+            min-height: 0;
         }
         
-        .graph-line {
+        .graph-line-container {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            height: 2px;
-            background: #3498db;
-            border-radius: 1px;
-        }
-        
-        .graph-dots {
-            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
             bottom: 10px;
-            left: 20px;
-            right: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .graph-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #3498db;
-            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
-        }
-        
-        .graph-trend {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            height: calc(100% - 60px);
             display: flex;
             align-items: end;
             justify-content: space-between;
         }
         
-        .graph-bar {
-            width: 4px;
-            background: linear-gradient(to top, #3498db, #2980b9);
-            border-radius: 2px;
-            min-height: 10px;
-            transition: height 0.3s ease;
+        .graph-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+        }
+        
+        .graph-point {
+            width: 3px;
+            height: 3px;
+            background: #3498db;
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .graph-point::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: inherit;
+            border-radius: 50%;
+            box-shadow: 0 0 6px currentColor;
+        }
+        
+        .graph-line-path {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        .graph-line-svg {
+            width: 100%;
+            height: 100%;
         }
         
         /* Responsive design */
         @media (max-width: 768px) {
             .graphs-container {
                 grid-template-columns: 1fr;
-                gap: 15px;
-                padding: 15px;
-            }
-            
-            .graph-card {
-                min-height: 250px;
+                grid-template-rows: repeat(4, 1fr);
+                gap: 10px;
+                padding: 10px;
+                height: calc(100vh - 100px);
             }
             
             .graph-header h3 {
-                font-size: 16px;
+                font-size: 14px;
             }
             
             .graph-value {
-                font-size: 18px;
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            .graphs-container {
+                height: calc(100vh - 80px);
+                gap: 8px;
+                padding: 8px;
+            }
+            
+            .graph-card {
+                padding: 10px;
+            }
+            
+            .graph-header {
+                margin-bottom: 5px;
+                padding-bottom: 5px;
             }
         }
 
@@ -1089,15 +1119,15 @@
         function updateGraphs(data) {
             if (!data) return;
             
-            // Update data arrays (keep last 20 points)
+            // Update data arrays (keep last 30 points for smoother lines)
             graphData.velocity.values.push(data.velocity || 0);
             graphData.flow.values.push(data.flowRate || 0);
             graphData.pressure.values.push(data.diffPressure || 0);
             graphData.fan.values.push(data.fanSpeed || 0);
             
-            // Keep only last 20 points
+            // Keep only last 30 points for smoother line graphs
             Object.keys(graphData).forEach(key => {
-                if (graphData[key].values.length > 20) {
+                if (graphData[key].values.length > 30) {
                     graphData[key].values.shift();
                 }
             });
@@ -1127,38 +1157,106 @@
             // Clear previous content
             container.innerHTML = '';
             
-            // Create trend bars
-            const trendDiv = document.createElement('div');
-            trendDiv.className = 'graph-trend';
+            // Create line container
+            const lineContainer = document.createElement('div');
+            lineContainer.className = 'graph-line-container';
             
-            const maxValue = Math.max(...values);
-            const minValue = Math.min(...values);
-            const range = maxValue - minValue || 1;
+            // Create SVG for line path
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'graph-line-svg');
+            svg.setAttribute('viewBox', '0 0 100 100');
+            svg.setAttribute('preserveAspectRatio', 'none');
             
-            values.forEach(value => {
-                const bar = document.createElement('div');
-                bar.className = 'graph-bar';
-                const height = Math.max(10, ((value - minValue) / range) * 100);
-                bar.style.height = `${height}%`;
-                bar.style.background = `linear-gradient(to top, ${color}, ${color}CC)`;
-                trendDiv.appendChild(bar);
-            });
-            
-            container.appendChild(trendDiv);
-            
-            // Create dots
-            const dotsDiv = document.createElement('div');
-            dotsDiv.className = 'graph-dots';
-            
-            for (let i = 0; i < Math.min(values.length, 15); i++) {
-                const dot = document.createElement('div');
-                dot.className = 'graph-dot';
-                dot.style.background = color;
-                dot.style.boxShadow = `0 0 10px ${color}80`;
-                dotsDiv.appendChild(dot);
+            // Calculate line path
+            if (values.length > 1) {
+                const maxValue = Math.max(...values);
+                const minValue = Math.min(...values);
+                const range = maxValue - minValue || 1;
+                
+                let pathData = '';
+                values.forEach((value, index) => {
+                    const x = (index / (values.length - 1)) * 100;
+                    const y = 100 - (((value - minValue) / range) * 80 + 10); // 10-90% of height
+                    
+                    if (index === 0) {
+                        pathData += `M ${x} ${y}`;
+                    } else {
+                        pathData += ` L ${x} ${y}`;
+                    }
+                });
+                
+                // Create path element
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathData);
+                path.setAttribute('stroke', color);
+                path.setAttribute('stroke-width', '2');
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke-linecap', 'round');
+                path.setAttribute('stroke-linejoin', 'round');
+                
+                // Add gradient fill under the line
+                const gradientId = `gradient-${Math.random().toString(36).substr(2, 9)}`;
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                gradient.setAttribute('id', gradientId);
+                gradient.setAttribute('x1', '0%');
+                gradient.setAttribute('y1', '0%');
+                gradient.setAttribute('x2', '0%');
+                gradient.setAttribute('y2', '100%');
+                
+                const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                stop1.setAttribute('offset', '0%');
+                stop1.setAttribute('stop-color', color);
+                stop1.setAttribute('stop-opacity', '0.3');
+                
+                const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                stop2.setAttribute('offset', '100%');
+                stop2.setAttribute('stop-color', color);
+                stop2.setAttribute('stop-opacity', '0.05');
+                
+                gradient.appendChild(stop1);
+                gradient.appendChild(stop2);
+                defs.appendChild(gradient);
+                svg.appendChild(defs);
+                
+                // Create filled area
+                const filledPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                filledPath.setAttribute('d', pathData + ' L 100 100 L 0 100 Z');
+                filledPath.setAttribute('fill', `url(#${gradientId})`);
+                
+                svg.appendChild(filledPath);
+                svg.appendChild(path);
+                
+                // Add data points
+                values.forEach((value, index) => {
+                    const x = (index / (values.length - 1)) * 100;
+                    const y = 100 - (((value - minValue) / range) * 80 + 10);
+                    
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', x);
+                    circle.setAttribute('cy', y);
+                    circle.setAttribute('r', '1.5');
+                    circle.setAttribute('fill', color);
+                    circle.setAttribute('stroke', color);
+                    circle.setAttribute('stroke-width', '0.5');
+                    
+                    // Add glow effect
+                    const glowCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    glowCircle.setAttribute('cx', x);
+                    glowCircle.setAttribute('cy', y);
+                    glowCircle.setAttribute('r', '2');
+                    glowCircle.setAttribute('fill', 'none');
+                    glowCircle.setAttribute('stroke', color);
+                    glowCircle.setAttribute('stroke-width', '0.5');
+                    glowCircle.setAttribute('opacity', '0.3');
+                    
+                    svg.appendChild(glowCircle);
+                    svg.appendChild(circle);
+                });
             }
             
-            container.appendChild(dotsDiv);
+            lineContainer.appendChild(svg);
+            container.appendChild(lineContainer);
         }
         
         // Initialize graphs with empty data
