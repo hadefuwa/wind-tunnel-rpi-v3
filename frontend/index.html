@@ -590,9 +590,125 @@
             flex-direction: column;
         }
 
-        /* Chart Zoom Controls */
-        .chart-zoom-applied {
-            transition: transform 0.3s ease;
+        /* New Graphs Page Styles */
+        .graphs-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            height: 100%;
+        }
+        
+        .graph-card {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid #4a5568;
+            display: flex;
+            flex-direction: column;
+            min-height: 300px;
+        }
+        
+        .graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .graph-header h3 {
+            margin: 0;
+            color: #ecf0f1;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .graph-value {
+            color: #3498db;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: right;
+        }
+        
+        .graph-chart {
+            flex: 1;
+            background: #1a252f;
+            border-radius: 10px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .graph-line {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: #3498db;
+            border-radius: 1px;
+        }
+        
+        .graph-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            right: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .graph-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #3498db;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+        
+        .graph-trend {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            height: calc(100% - 60px);
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+        }
+        
+        .graph-bar {
+            width: 4px;
+            background: linear-gradient(to top, #3498db, #2980b9);
+            border-radius: 2px;
+            min-height: 10px;
+            transition: height 0.3s ease;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .graphs-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .graph-card {
+                min-height: 250px;
+            }
+            
+            .graph-header h3 {
+                font-size: 16px;
+            }
+            
+            .graph-value {
+                font-size: 18px;
+            }
         }
 
         .settings-row {
@@ -773,30 +889,37 @@
 
             <!-- Graphs Tab -->
             <div id="graphs" class="tab-content">
-                <div class="graphs-grid">
-                    <div class="card">
-                        <h3 id="velocity-chart-title">Velocity Chart</h3>
-                        <div class="chart-container">
-                            <div id="velocityChart2" class="plotly-chart"></div>
+                <div class="graphs-container">
+                    <div class="graph-card">
+                        <div class="graph-header">
+                            <h3 id="graph-velocity-title">Velocity</h3>
+                            <div class="graph-value" id="graph-velocity-value">0.0 m/s</div>
                         </div>
+                        <div class="graph-chart" id="graph-velocity-chart"></div>
                     </div>
-                    <div class="card">
-                        <h3 id="flow-rate-chart-title">Flow Rate Chart</h3>
-                        <div class="chart-container">
-                            <div id="flowRateChart" class="plotly-chart"></div>
+                    
+                    <div class="graph-card">
+                        <div class="graph-header">
+                            <h3 id="graph-flow-title">Flow Rate</h3>
+                            <div class="graph-value" id="graph-flow-value">0.0 l/min</div>
                         </div>
+                        <div class="graph-chart" id="graph-flow-chart"></div>
                     </div>
-                    <div class="card">
-                        <h3 id="diff-pressure-chart-title">Diff Pressure Chart</h3>
-                        <div class="chart-container">
-                            <div id="pressureChart2" class="plotly-chart"></div>
+                    
+                    <div class="graph-card">
+                        <div class="graph-header">
+                            <h3 id="graph-pressure-title">Diff Pressure</h3>
+                            <div class="graph-value" id="graph-pressure-value">0.0 Pa</div>
                         </div>
+                        <div class="graph-chart" id="graph-pressure-chart"></div>
                     </div>
-                    <div class="card">
-                        <h3 id="fan-speed-chart-title">Fan Speed Chart</h3>
-                        <div class="chart-container">
-                            <div id="fanPowerChart" class="plotly-chart"></div>
+                    
+                    <div class="graph-card">
+                        <div class="graph-header">
+                            <h3 id="graph-fan-title">Fan Speed</h3>
+                            <div class="graph-value" id="graph-fan-value">0 RPM</div>
                         </div>
+                        <div class="graph-chart" id="graph-fan-chart"></div>
                     </div>
                 </div>
             </div>
@@ -955,15 +1078,107 @@
             localStorage.setItem(ZOOM_SETTINGS_KEY, chartZoomLevel.toString());
         }
 
-        // Apply zoom to all charts (DISABLED to prevent scaling issues)
-        function applyChartZoom() {
-            // Zoom functionality disabled to prevent chart scaling issues
-            // Charts will display at normal size
-            const chartContainers = document.querySelectorAll('.chart-container');
-            chartContainers.forEach(container => {
-                container.style.transform = '';
-                container.style.transformOrigin = '';
-                container.classList.remove('chart-zoom-applied');
+        // New Simple Graph System
+        const graphData = {
+            velocity: { values: [], color: '#3498db' },
+            flow: { values: [], color: '#2ecc71' },
+            pressure: { values: [], color: '#e74c3c' },
+            fan: { values: [], color: '#f39c12' }
+        };
+        
+        function updateGraphs(data) {
+            if (!data) return;
+            
+            // Update data arrays (keep last 20 points)
+            graphData.velocity.values.push(data.velocity || 0);
+            graphData.flow.values.push(data.flowRate || 0);
+            graphData.pressure.values.push(data.diffPressure || 0);
+            graphData.fan.values.push(data.fanSpeed || 0);
+            
+            // Keep only last 20 points
+            Object.keys(graphData).forEach(key => {
+                if (graphData[key].values.length > 20) {
+                    graphData[key].values.shift();
+                }
+            });
+            
+            // Update displays
+            updateGraphDisplay('velocity', data.velocity, 'm/s');
+            updateGraphDisplay('flow', data.flowRate, 'l/min');
+            updateGraphDisplay('pressure', data.diffPressure, 'Pa');
+            updateGraphDisplay('fan', data.fanSpeed, 'RPM');
+        }
+        
+        function updateGraphDisplay(type, value, unit) {
+            const valueElement = document.getElementById(`graph-${type}-value`);
+            if (valueElement) {
+                valueElement.textContent = `${value || 0} ${unit}`;
+            }
+            
+            const chartElement = document.getElementById(`graph-${type}-chart`);
+            if (chartElement) {
+                updateSimpleChart(chartElement, graphData[type].values, graphData[type].color);
+            }
+        }
+        
+        function updateSimpleChart(container, values, color) {
+            if (!values || values.length === 0) return;
+            
+            // Clear previous content
+            container.innerHTML = '';
+            
+            // Create trend bars
+            const trendDiv = document.createElement('div');
+            trendDiv.className = 'graph-trend';
+            
+            const maxValue = Math.max(...values);
+            const minValue = Math.min(...values);
+            const range = maxValue - minValue || 1;
+            
+            values.forEach(value => {
+                const bar = document.createElement('div');
+                bar.className = 'graph-bar';
+                const height = Math.max(10, ((value - minValue) / range) * 100);
+                bar.style.height = `${height}%`;
+                bar.style.background = `linear-gradient(to top, ${color}, ${color}CC)`;
+                trendDiv.appendChild(bar);
+            });
+            
+            container.appendChild(trendDiv);
+            
+            // Create dots
+            const dotsDiv = document.createElement('div');
+            dotsDiv.className = 'graph-dots';
+            
+            for (let i = 0; i < Math.min(values.length, 15); i++) {
+                const dot = document.createElement('div');
+                dot.className = 'graph-dot';
+                dot.style.background = color;
+                dot.style.boxShadow = `0 0 10px ${color}80`;
+                dotsDiv.appendChild(dot);
+            }
+            
+            container.appendChild(dotsDiv);
+        }
+        
+        // Initialize graphs with empty data
+        function initializeGraphs() {
+            ['velocity', 'flow', 'pressure', 'fan'].forEach(type => {
+                const chartElement = document.getElementById(`graph-${type}-chart`);
+                if (chartElement) {
+                    chartElement.innerHTML = `
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            height: 100%;
+                            color: #7f8c8d;
+                            font-size: 14px;
+                        ">
+                            <div>⚡ Waiting for data...</div>
+                        </div>
+                    `;
+                }
             });
         }
 
@@ -1478,34 +1693,11 @@
                 dashboardChartTitle.textContent = velocityTitle;
             }
             
-            const velocityChartTitle = document.getElementById('velocity-chart-title');
-            if (velocityChartTitle) {
-                velocityChartTitle.textContent = velocityTitle;
-            }
-            
-            const flowRateChartTitle = document.getElementById('flow-rate-chart-title');
-            if (flowRateChartTitle) {
-                flowRateChartTitle.textContent = flowRateTitle;
-            }
-            
-            const diffPressureChartTitle = document.getElementById('diff-pressure-chart-title');
-            if (diffPressureChartTitle) {
-                diffPressureChartTitle.textContent = diffPressureTitle;
-            }
-            
-            const fanSpeedChartTitle = document.getElementById('fan-speed-chart-title');
-            if (fanSpeedChartTitle) {
-                fanSpeedChartTitle.textContent = fanSpeedTitle;
-            }
+            // Update new graphs page
+            updateGraphs(data);
             
             // Dashboard charts (no internal title)
             drawSimpleChart('velocityChart', velocityData, '', '#3498db');
-            
-            // Graphs tab charts (no internal titles)
-            drawSimpleChart('velocityChart2', velocityData, '', '#3498db');
-            drawSimpleChart('flowRateChart', flowRateData, '', '#2ecc71');
-            drawSimpleChart('pressureChart2', diffPressureData, '', '#e74c3c');
-            drawSimpleChart('fanPowerChart', fanSpeedData, '', '#f39c12');
             
             // Debug logging
             console.log('Chart data updated:', {
@@ -1575,6 +1767,9 @@
 
         // Initialize charts with sample data
         function initializeCharts() {
+            // Initialize new graphs system
+            initializeGraphs();
+            
             // Create some sample data points
             const sampleData = [];
             for (let i = 0; i < 10; i++) {
@@ -2140,15 +2335,13 @@
             }, 1000); // Wait 1 second for page to fully load
         });
 
-        // Add window resize listener to ensure charts resize properly
+        // Add window resize listener (simplified)
         window.addEventListener('resize', function() {
-            // Resize all Plotly charts
-            const chartElements = document.querySelectorAll('.plotly-chart');
-            chartElements.forEach(chart => {
-                if (chart.id) {
-                    Plotly.Plots.resize(chart.id);
-                }
-            });
+            // Resize dashboard chart only
+            const dashboardChart = document.getElementById('velocityChart');
+            if (dashboardChart) {
+                Plotly.Plots.resize('velocityChart');
+            }
         });
 
         // Data fetching interval
