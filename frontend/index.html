@@ -1007,16 +1007,12 @@
                 return;
             }
             
-            // Create time series x-axis
-            const timeLabels = validData.map((_, index) => {
-                const now = new Date();
-                const time = new Date(now.getTime() - (validData.length - index - 1) * 1000);
-                return time.toLocaleTimeString();
-            });
+            // Create sample indices for x-axis instead of time
+            const xValues = validData.map((_, index) => index + 1);
             
             // Create trace
             const trace = {
-                x: timeLabels,
+                x: xValues,
                 y: validData,
                 type: 'scatter',
                 mode: 'lines+markers',
@@ -1056,7 +1052,7 @@
                     color: '#ecf0f1'
                 },
                 xaxis: {
-                    title: 'Sample',
+                    title: '',  // Empty title instead of 'Time' or 'Sample'
                     titlefont: {
                         color: '#bdc3c7'
                     },
@@ -1067,7 +1063,7 @@
                     zerolinecolor: '#34495e',
                     showgrid: true,
                     zeroline: false,
-                    showticklabels: false // Hide timestamp labels
+                    showticklabels: false  // Hide timestamp labels
                 },
                 yaxis: {
                     title: label,
