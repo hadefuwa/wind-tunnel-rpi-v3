@@ -987,9 +987,11 @@
 
         // Professional Plotly chart implementation
         function drawSimpleChart(containerId, data, label, color) {
+            console.log(`[DEBUG] drawSimpleChart called for ${containerId} with data:`, data);
+            
             const container = document.getElementById(containerId);
             if (!container) {
-                console.log('Container not found:', containerId);
+                console.error(`[DEBUG] Container not found: ${containerId}`);
                 return;
             }
             
@@ -1213,24 +1215,36 @@
         // API functions with error handling
         async function startCollection() {
             try {
-                console.log('Starting data collection...');
+                console.log('[DEBUG] Starting data collection...');
                 const response = await fetch('/api/start', { method: 'POST' });
+                console.log('[DEBUG] Start API response status:', response.status);
+                
                 if (response.ok) {
                     const result = await response.json();
-                    isRunning = true;
-                    updateConnectionStatus(true);
-                    console.log('Started collection:', result);
+                    console.log('[DEBUG] Start collection API response:', JSON.stringify(result));
                     
-                    // Clear any existing "No data yet" message
+                    isRunning = true;
+                    dataBuffer = []; // Clear any existing data
+                    updateConnectionStatus(true);
+                    
+                    // Clear any existing data display
                     const logEl = document.getElementById('data-log-container');
-                    if (logEl.children.length === 1 && logEl.children[0].tagName === 'P') {
+                    if (logEl) {
+                        console.log('[DEBUG] Updating data-log-container');
                         logEl.innerHTML = '<p style="opacity: 0.7; text-align: center; margin-top: 100px;">Starting data collection...</p>';
+                    } else {
+                        console.error('[DEBUG] data-log-container not found');
                     }
+                    
+                    // Reset charts
+                    console.log('[DEBUG] Reinitializing charts after start');
+                    initializeCharts();
                 } else {
-                    throw new Error('Server error');
+                    console.error('[DEBUG] Server error when starting collection:', response.status);
+                    throw new Error('Server error: ' + response.status);
                 }
             } catch (error) {
-                console.error('Error starting collection:', error);
+                console.error('[DEBUG] Error starting collection:', error);
                 updateConnectionStatus(false);
             }
         }
@@ -1312,7 +1326,24 @@
 
         function updateDataLog(data) {
             console.log('updateDataLog called with:', data);
+            
+            // Add debug info
+            if (!data || typeof data !== 'object') {
+                console.error('Invalid data object received in updateDataLog:', data);
+                return;
+            }
+            
+            if (!data.timestamp) {
+                console.error('Data missing timestamp:', data);
+                return;
+            }
+            
             const logEl = document.getElementById('data-log-container');
+            if (!logEl) {
+                console.error('Data log container not found!');
+                return;
+            }
+            
             const timestamp = new Date(data.timestamp * 1000).toLocaleTimeString();
             
             // Clear "No data yet" message
@@ -1339,13 +1370,28 @@
         }
 
         function updateCharts(data) {
+            console.log('[DEBUG] updateCharts called with data:', JSON.stringify(data));
+            
+            if (!data || typeof data !== 'object') {
+                console.error('[DEBUG] Invalid data provided to updateCharts:', data);
+                return;
+            }
+            
             dataBuffer.push(data);
             if (dataBuffer.length > 30) {
                 dataBuffer.shift();
             }
             
+            console.log('[DEBUG] Current dataBuffer length:', dataBuffer.length);
+            console.log('[DEBUG] First item in buffer:', dataBuffer.length > 0 ? JSON.stringify(dataBuffer[0]) : 'none');
+            console.log('[DEBUG] Last item in buffer:', dataBuffer.length > 0 ? JSON.stringify(dataBuffer[dataBuffer.length-1]) : 'none');
+            
             // Extract data for charts
-            const velocityData = dataBuffer.map(d => parseFloat(d.velocity) || 0);
+            const velocityData = dataBuffer.map(d => {
+                const val = parseFloat(d.velocity);
+                if (isNaN(val)) console.log('[DEBUG] Invalid velocity:', d.velocity, 'in data:', d);
+                return val || 0;
+            });
             const flowRateData = dataBuffer.map(d => parseFloat(d.flowRate) || 0);
             const diffPressureData = dataBuffer.map(d => parseFloat(d.diffPressure) || 0);
             const staticPressureData = dataBuffer.map(d => parseFloat(d.staticPressure) || 0);
@@ -1353,6 +1399,8 @@
             const powerData = dataBuffer.map(d => parseFloat(d.power) || 0);
             const valveData = dataBuffer.map(d => parseFloat(d.valvePosition) || 0);
             const dragData = dataBuffer.map(d => parseFloat(d.dragForce) || 0);
+            
+            console.log('[DEBUG] Extracted velocityData:', velocityData);
             
             // Dashboard charts
             drawSimpleChart('velocityChart', velocityData, 'Velocity (m/s)', '#3498db');
@@ -1379,21 +1427,40 @@
         // Data fetching with better error handling
         async function fetchLatestData() {
             if (!isRunning) {
+                console.log('[DEBUG] fetchLatestData - not running, skipping fetch');
                 return;
             }
             
+            console.log('[DEBUG] Attempting to fetch latest data from API');
+            
             try {
                 const response = await fetch('/api/latest');
+                console.log('[DEBUG] API response status:', response.status);
+                
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Fetched data:', data);
+                    console.log('[DEBUG] Fetched data:', JSON.stringify(data));
                     
-                    if (!data.error && data) {
-                        updateMetrics(data);
-                        updateDataLog(data);
-                        updateCharts(data);
-                        updateVisualizationData(data);
-                        updateConnectionStatus(true);
+                    // Validate received data
+                    if (!data) {
+                        console.error('[DEBUG] Empty data received from API');
+                        return;
+                    }
+                    
+                    if (data.error) {
+                        console.error('[DEBUG] API returned error:', data.error);
+                        return;
+                    }
+                    
+                    // Log the key data points
+                    console.log(`[DEBUG] Key data values: velocity=${data.velocity}, flowRate=${data.flowRate}`);
+                    
+                    // Update all the components with the new data
+                    updateMetrics(data);
+                    updateDataLog(data);
+                    updateCharts(data);
+                    updateVisualizationData(data);
+                    updateConnectionStatus(true);
                         
                         // Update data count safely
                         const dataCountEl = document.getElementById('dataCount');
@@ -1402,16 +1469,16 @@
                         }
                     }
                 } else {
-                    console.error('Server error:', response.status);
+                    console.error('[DEBUG] Server error:', response.status);
                     throw new Error('Server error');
                 }
             } catch (error) {
-                console.error('Data fetch error:', error);
+                console.error('[DEBUG] Data fetch error:', error);
                 updateConnectionStatus(false);
                 
                 // If we can't connect to the server, show a more helpful message
                 if (error.message.includes('fetch') || error.message.includes('CONNECTION_REFUSED')) {
-                    console.log('Server connection failed - is the Flask app running?');
+                    console.log('[DEBUG] Server connection failed - is the Flask app running?');
                 }
             }
         }
