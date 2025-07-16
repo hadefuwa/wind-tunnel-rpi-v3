@@ -673,12 +673,12 @@
 
         <!-- Navigation -->
         <div class="nav">
-            <div class="nav-item active" onclick="showTab('dashboard')">Dashboard</div>
-            <div class="nav-item" onclick="showTab('controls')">Controls</div>
-            <div class="nav-item" onclick="showTab('graphs')">Graphs</div>
-            <div class="nav-item" onclick="showTab('visualization')">Visualization</div>
-            <div class="nav-item" onclick="showTab('data-log')">Data Log</div>
-            <div class="nav-item" onclick="showTab('settings')">Settings</div>
+            <div class="nav-item active" onclick="showTab('dashboard', event)">Dashboard</div>
+            <div class="nav-item" onclick="showTab('controls', event)">Controls</div>
+            <div class="nav-item" onclick="showTab('graphs', event)">Graphs</div>
+            <div class="nav-item" onclick="showTab('visualization', event)">Visualization</div>
+            <div class="nav-item" onclick="showTab('data-log', event)">Data Log</div>
+            <div class="nav-item" onclick="showTab('settings', event)">Settings</div>
         </div>
 
         <!-- Content -->
@@ -1135,7 +1135,10 @@
         }
 
         // Tab switching
-        function showTab(tabName) {
+        function showTab(tabName, e) {
+            // Get the event from the parameter or from the global event
+            const evt = e || window.event;
+            
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -1146,7 +1149,12 @@
             
             document.getElementById(tabName).classList.add('active');
             
-            event.target.classList.add('active');
+            // Check if we have a valid target from the event
+            if (evt && evt.currentTarget) {
+                evt.currentTarget.classList.add('active');
+            } else if (evt && evt.target) {
+                evt.target.classList.add('active');
+            }
             
             // Handle tab-specific initialization
             setTimeout(() => {
@@ -1461,12 +1469,11 @@
                     updateCharts(data);
                     updateVisualizationData(data);
                     updateConnectionStatus(true);
-                        
-                        // Update data count safely
-                        const dataCountEl = document.getElementById('dataCount');
-                        if (dataCountEl) {
-                            dataCountEl.textContent = dataBuffer.length;
-                        }
+                    
+                    // Update data count safely
+                    const dataCountEl = document.getElementById('dataCount');
+                    if (dataCountEl) {
+                        dataCountEl.textContent = dataBuffer.length;
                     }
                 } else {
                     console.error('[DEBUG] Server error:', response.status);
