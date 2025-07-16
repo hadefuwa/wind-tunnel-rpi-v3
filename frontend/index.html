@@ -321,13 +321,15 @@
             border-radius: 12px;
             padding: 15px;
             display: flex;
-            align-items: center;
+            align-items: stretch;
             justify-content: center;
+            flex-direction: column;
             flex: 1;
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border: 1px solid #4a5568;
             transition: all 0.3s ease;
+            min-height: 0;
         }
 
         .chart-container:hover {
@@ -358,10 +360,19 @@
             height: 100%;
             border-radius: 8px;
             background: transparent;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .plotly-chart .plotly {
             border-radius: 8px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .plotly-chart .main-svg {
+            height: 100% !important;
         }
 
         /* Tunnel Image */
@@ -573,7 +584,10 @@
 
         .graphs-grid .chart-container {
             flex: 1;
-            min-height: 0; /* Allow flex items to shrink */
+            min-height: 0;
+            height: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Chart Zoom Controls */
@@ -1101,6 +1115,8 @@
                     t: label ? 40 : 20,  // Smaller top margin if no title
                     b: 50
                 },
+                height: undefined,  // Let it auto-size to container
+                autosize: true,
                 showlegend: false,
                 hovermode: 'closest'
             };
@@ -1122,8 +1138,11 @@
                 showTips: false
             };
             
-            // Create the plot
-            Plotly.newPlot(containerId, [trace], layout, config);
+            // Create the plot with proper sizing
+            Plotly.newPlot(containerId, [trace], layout, config).then(() => {
+                // Ensure the chart fills the container
+                Plotly.Plots.resize(containerId);
+            });
         }
 
         function drawEmptyChart(container, label) {
@@ -2119,6 +2138,17 @@
             setTimeout(() => {
                 startCollection();
             }, 1000); // Wait 1 second for page to fully load
+        });
+
+        // Add window resize listener to ensure charts resize properly
+        window.addEventListener('resize', function() {
+            // Resize all Plotly charts
+            const chartElements = document.querySelectorAll('.plotly-chart');
+            chartElements.forEach(chart => {
+                if (chart.id) {
+                    Plotly.Plots.resize(chart.id);
+                }
+            });
         });
 
         // Data fetching interval
