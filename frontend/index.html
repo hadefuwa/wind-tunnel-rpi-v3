@@ -941,14 +941,15 @@
             localStorage.setItem(ZOOM_SETTINGS_KEY, chartZoomLevel.toString());
         }
 
-        // Apply zoom to all charts
+        // Apply zoom to all charts (DISABLED to prevent scaling issues)
         function applyChartZoom() {
+            // Zoom functionality disabled to prevent chart scaling issues
+            // Charts will display at normal size
             const chartContainers = document.querySelectorAll('.chart-container');
             chartContainers.forEach(container => {
-                const scale = chartZoomLevel / 100;
-                container.style.transform = `scale(${scale})`;
-                container.style.transformOrigin = 'center';
-                container.classList.add('chart-zoom-applied');
+                container.style.transform = '';
+                container.style.transformOrigin = '';
+                container.classList.remove('chart-zoom-applied');
             });
         }
 
@@ -1090,7 +1091,9 @@
                     gridcolor: '#34495e',
                     zerolinecolor: '#34495e',
                     showgrid: true,
-                    zeroline: false
+                    zeroline: false,
+                    autorange: true,  // Enable auto-ranging
+                    rangemode: 'normal'  // Use normal ranging (not forced to zero)
                 },
                 margin: {
                     l: 60,
@@ -1121,11 +1124,6 @@
             
             // Create the plot
             Plotly.newPlot(containerId, [trace], layout, config);
-            
-            // Apply zoom after plot is created
-            setTimeout(() => {
-                applyChartZoom();
-            }, 100);
         }
 
         function drawEmptyChart(container, label) {
@@ -1489,11 +1487,6 @@
             drawSimpleChart('flowRateChart', flowRateData, '', '#2ecc71');
             drawSimpleChart('pressureChart2', diffPressureData, '', '#e74c3c');
             drawSimpleChart('fanPowerChart', fanSpeedData, '', '#f39c12');
-            
-            // Apply zoom to charts after drawing
-            setTimeout(() => {
-                applyChartZoom();
-            }, 50);
             
             // Debug logging
             console.log('Chart data updated:', {
