@@ -1,4 +1,4 @@
-# Wind Tunnel RPi v3 - Management Demo
+# Wind Tunnel RPi v3
 
 A lightweight web-based wind tunnel data acquisition system for Raspberry Pi with real-time visualization and SPI sensor integration.
 
