@@ -595,32 +595,46 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
-            gap: 15px;
-            padding: 15px;
-            height: calc(100vh - 120px); /* Fit screen height minus header */
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 120px);
             max-height: calc(100vh - 120px);
             overflow: hidden;
+            background: #1a1a1a;
         }
         
         .graph-card {
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             border: 1px solid #4a5568;
             display: flex;
             flex-direction: column;
             min-height: 0;
             max-height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .graph-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #f39c12);
+            opacity: 0.6;
         }
         
         .graph-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #3498db;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #4a5568;
             flex-shrink: 0;
         }
         
@@ -629,23 +643,80 @@
             color: #ecf0f1;
             font-size: 16px;
             font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
         
         .graph-value {
             color: #3498db;
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 700;
             text-align: right;
+            text-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
         }
         
         .graph-chart {
             flex: 1;
-            background: #1a252f;
-            border-radius: 10px;
-            padding: 10px;
+            background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
+            border-radius: 12px;
+            padding: 20px;
             position: relative;
             overflow: hidden;
             min-height: 0;
+            border: 1px solid #34495e;
+        }
+        
+        .graph-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        .graph-grid-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .graph-grid-line.horizontal {
+            left: 0;
+            right: 0;
+            height: 1px;
+        }
+        
+        .graph-grid-line.vertical {
+            top: 0;
+            bottom: 0;
+            width: 1px;
+        }
+        
+        .graph-axis-labels {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            font-size: 10px;
+            color: #7f8c8d;
+        }
+        
+        .graph-y-label {
+            position: absolute;
+            left: -15px;
+            transform: translateY(-50%);
+            font-size: 9px;
+            color: #95a5a6;
+        }
+        
+        .graph-x-label {
+            position: absolute;
+            bottom: -15px;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: #95a5a6;
         }
         
         .graph-line-container {
@@ -659,50 +730,49 @@
             justify-content: space-between;
         }
         
-        .graph-line {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
-            display: flex;
-            align-items: end;
-            justify-content: space-between;
-        }
-        
-        .graph-point {
-            width: 3px;
-            height: 3px;
-            background: #3498db;
-            border-radius: 50%;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .graph-point::before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            right: -1px;
-            bottom: -1px;
-            background: inherit;
-            border-radius: 50%;
-            box-shadow: 0 0 6px currentColor;
-        }
-        
-        .graph-line-path {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-        }
-        
         .graph-line-svg {
             width: 100%;
             height: 100%;
+        }
+        
+        .graph-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            border: 1px solid #34495e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Professional status indicators */
+        .graph-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #95a5a6;
+        }
+        
+        .graph-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2ecc71;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
         
         /* Responsive design */
@@ -710,9 +780,13 @@
             .graphs-container {
                 grid-template-columns: 1fr;
                 grid-template-rows: repeat(4, 1fr);
-                gap: 10px;
-                padding: 10px;
+                gap: 15px;
+                padding: 15px;
                 height: calc(100vh - 100px);
+            }
+            
+            .graph-card {
+                padding: 15px;
             }
             
             .graph-header h3 {
@@ -727,17 +801,17 @@
         @media (max-height: 600px) {
             .graphs-container {
                 height: calc(100vh - 80px);
-                gap: 8px;
-                padding: 8px;
-            }
-            
-            .graph-card {
+                gap: 10px;
                 padding: 10px;
             }
             
+            .graph-card {
+                padding: 12px;
+            }
+            
             .graph-header {
-                margin-bottom: 5px;
-                padding-bottom: 5px;
+                margin-bottom: 8px;
+                padding-bottom: 8px;
             }
         }
 
@@ -770,6 +844,7 @@
             border-radius: 3px;
             outline: none;
             -webkit-appearance: none;
+            appearance: none;
         }
 
         .zoom-slider::-webkit-slider-thumb {
@@ -1157,106 +1232,224 @@
             // Clear previous content
             container.innerHTML = '';
             
-            // Create line container
-            const lineContainer = document.createElement('div');
-            lineContainer.className = 'graph-line-container';
+            // Create main container with proper structure
+            const chartContainer = document.createElement('div');
+            chartContainer.style.position = 'relative';
+            chartContainer.style.width = '100%';
+            chartContainer.style.height = '100%';
+            chartContainer.style.overflow = 'hidden';
             
-            // Create SVG for line path
+            // Create SVG element
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('class', 'graph-line-svg');
-            svg.setAttribute('viewBox', '0 0 100 100');
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            svg.setAttribute('viewBox', '0 0 400 200');
             svg.setAttribute('preserveAspectRatio', 'none');
             
-            // Calculate line path
+            // Create defs for gradients and filters
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            
+            // Create gradient for area fill
+            const gradientId = `gradient-${Math.random().toString(36).substr(2, 9)}`;
+            const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+            gradient.setAttribute('id', gradientId);
+            gradient.setAttribute('x1', '0%');
+            gradient.setAttribute('y1', '0%');
+            gradient.setAttribute('x2', '0%');
+            gradient.setAttribute('y2', '100%');
+            
+            const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop1.setAttribute('offset', '0%');
+            stop1.setAttribute('stop-color', color);
+            stop1.setAttribute('stop-opacity', '0.4');
+            
+            const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop2.setAttribute('offset', '100%');
+            stop2.setAttribute('stop-color', color);
+            stop2.setAttribute('stop-opacity', '0.05');
+            
+            gradient.appendChild(stop1);
+            gradient.appendChild(stop2);
+            defs.appendChild(gradient);
+            
+            // Create glow filter for the line
+            const filterId = `glow-${Math.random().toString(36).substr(2, 9)}`;
+            const filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+            filter.setAttribute('id', filterId);
+            filter.setAttribute('x', '-50%');
+            filter.setAttribute('y', '-50%');
+            filter.setAttribute('width', '200%');
+            filter.setAttribute('height', '200%');
+            
+            const feGaussianBlur = document.createElementNS('http://www.w3.org/2000/svg', 'feGaussianBlur');
+            feGaussianBlur.setAttribute('stdDeviation', '2');
+            feGaussianBlur.setAttribute('result', 'coloredBlur');
+            
+            const feMerge = document.createElementNS('http://www.w3.org/2000/svg', 'feMerge');
+            const feMergeNode1 = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
+            feMergeNode1.setAttribute('in', 'coloredBlur');
+            const feMergeNode2 = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
+            feMergeNode2.setAttribute('in', 'SourceGraphic');
+            
+            feMerge.appendChild(feMergeNode1);
+            feMerge.appendChild(feMergeNode2);
+            filter.appendChild(feGaussianBlur);
+            filter.appendChild(feMerge);
+            defs.appendChild(filter);
+            
+            svg.appendChild(defs);
+            
+            // Create grid lines
+            const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            gridGroup.setAttribute('class', 'grid-lines');
+            
+            // Horizontal grid lines
+            for (let i = 0; i <= 5; i++) {
+                const y = 20 + (i * 160 / 5);
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', '20');
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', '380');
+                line.setAttribute('y2', y);
+                line.setAttribute('stroke', 'rgba(255, 255, 255, 0.1)');
+                line.setAttribute('stroke-width', '0.5');
+                gridGroup.appendChild(line);
+            }
+            
+            // Vertical grid lines
+            for (let i = 0; i <= 6; i++) {
+                const x = 20 + (i * 360 / 6);
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x);
+                line.setAttribute('y1', '20');
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', '180');
+                line.setAttribute('stroke', 'rgba(255, 255, 255, 0.1)');
+                line.setAttribute('stroke-width', '0.5');
+                gridGroup.appendChild(line);
+            }
+            
+            svg.appendChild(gridGroup);
+            
+            // Process data and create chart
             if (values.length > 1) {
                 const maxValue = Math.max(...values);
                 const minValue = Math.min(...values);
                 const range = maxValue - minValue || 1;
                 
+                // Create Y-axis labels
+                const labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                labelsGroup.setAttribute('class', 'axis-labels');
+                
+                for (let i = 0; i <= 5; i++) {
+                    const y = 20 + (i * 160 / 5);
+                    const value = maxValue - (i * range / 5);
+                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    label.setAttribute('x', '15');
+                    label.setAttribute('y', y + 2);
+                    label.setAttribute('text-anchor', 'end');
+                    label.setAttribute('font-size', '8');
+                    label.setAttribute('fill', '#95a5a6');
+                    label.setAttribute('font-family', 'monospace');
+                    label.textContent = value.toFixed(1);
+                    labelsGroup.appendChild(label);
+                }
+                
+                svg.appendChild(labelsGroup);
+                
+                // Create line path
                 let pathData = '';
+                let areaData = '';
+                
                 values.forEach((value, index) => {
-                    const x = (index / (values.length - 1)) * 100;
-                    const y = 100 - (((value - minValue) / range) * 80 + 10); // 10-90% of height
+                    const x = 20 + (index * 360 / (values.length - 1));
+                    const y = 180 - (((value - minValue) / range) * 160);
                     
                     if (index === 0) {
                         pathData += `M ${x} ${y}`;
+                        areaData += `M ${x} 180 L ${x} ${y}`;
                     } else {
                         pathData += ` L ${x} ${y}`;
+                        areaData += ` L ${x} ${y}`;
                     }
                 });
                 
-                // Create path element
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.setAttribute('d', pathData);
-                path.setAttribute('stroke', color);
-                path.setAttribute('stroke-width', '2');
-                path.setAttribute('fill', 'none');
-                path.setAttribute('stroke-linecap', 'round');
-                path.setAttribute('stroke-linejoin', 'round');
+                // Complete area path
+                areaData += ' L 380 180 Z';
                 
-                // Add gradient fill under the line
-                const gradientId = `gradient-${Math.random().toString(36).substr(2, 9)}`;
-                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-                const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
-                gradient.setAttribute('id', gradientId);
-                gradient.setAttribute('x1', '0%');
-                gradient.setAttribute('y1', '0%');
-                gradient.setAttribute('x2', '0%');
-                gradient.setAttribute('y2', '100%');
+                // Create area fill
+                const areaPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                areaPath.setAttribute('d', areaData);
+                areaPath.setAttribute('fill', `url(#${gradientId})`);
+                areaPath.setAttribute('stroke', 'none');
+                svg.appendChild(areaPath);
                 
-                const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-                stop1.setAttribute('offset', '0%');
-                stop1.setAttribute('stop-color', color);
-                stop1.setAttribute('stop-opacity', '0.3');
+                // Create main line with glow
+                const linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                linePath.setAttribute('d', pathData);
+                linePath.setAttribute('fill', 'none');
+                linePath.setAttribute('stroke', color);
+                linePath.setAttribute('stroke-width', '1.5');
+                linePath.setAttribute('stroke-linecap', 'round');
+                linePath.setAttribute('stroke-linejoin', 'round');
+                linePath.setAttribute('filter', `url(#${filterId})`);
+                svg.appendChild(linePath);
                 
-                const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-                stop2.setAttribute('offset', '100%');
-                stop2.setAttribute('stop-color', color);
-                stop2.setAttribute('stop-opacity', '0.05');
-                
-                gradient.appendChild(stop1);
-                gradient.appendChild(stop2);
-                defs.appendChild(gradient);
-                svg.appendChild(defs);
-                
-                // Create filled area
-                const filledPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                filledPath.setAttribute('d', pathData + ' L 100 100 L 0 100 Z');
-                filledPath.setAttribute('fill', `url(#${gradientId})`);
-                
-                svg.appendChild(filledPath);
-                svg.appendChild(path);
-                
-                // Add data points
+                // Add data points with hover effects
                 values.forEach((value, index) => {
-                    const x = (index / (values.length - 1)) * 100;
-                    const y = 100 - (((value - minValue) / range) * 80 + 10);
+                    const x = 20 + (index * 360 / (values.length - 1));
+                    const y = 180 - (((value - minValue) / range) * 160);
                     
                     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                     circle.setAttribute('cx', x);
                     circle.setAttribute('cy', y);
-                    circle.setAttribute('r', '1.5');
+                    circle.setAttribute('r', '2');
                     circle.setAttribute('fill', color);
-                    circle.setAttribute('stroke', color);
-                    circle.setAttribute('stroke-width', '0.5');
+                    circle.setAttribute('stroke', '#ffffff');
+                    circle.setAttribute('stroke-width', '1');
+                    circle.setAttribute('opacity', '0.8');
                     
-                    // Add glow effect
-                    const glowCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    glowCircle.setAttribute('cx', x);
-                    glowCircle.setAttribute('cy', y);
-                    glowCircle.setAttribute('r', '2');
-                    glowCircle.setAttribute('fill', 'none');
-                    glowCircle.setAttribute('stroke', color);
-                    glowCircle.setAttribute('stroke-width', '0.5');
-                    glowCircle.setAttribute('opacity', '0.3');
+                    // Add hover effect
+                    circle.addEventListener('mouseenter', function() {
+                        this.setAttribute('r', '4');
+                        this.setAttribute('opacity', '1');
+                    });
                     
-                    svg.appendChild(glowCircle);
+                    circle.addEventListener('mouseleave', function() {
+                        this.setAttribute('r', '2');
+                        this.setAttribute('opacity', '0.8');
+                    });
+                    
                     svg.appendChild(circle);
                 });
             }
             
-            lineContainer.appendChild(svg);
-            container.appendChild(lineContainer);
+            // Add professional status indicator
+            const statusDiv = document.createElement('div');
+            statusDiv.style.position = 'absolute';
+            statusDiv.style.top = '10px';
+            statusDiv.style.right = '10px';
+            statusDiv.style.display = 'flex';
+            statusDiv.style.alignItems = 'center';
+            statusDiv.style.gap = '6px';
+            statusDiv.style.fontSize = '10px';
+            statusDiv.style.color = '#95a5a6';
+            statusDiv.style.fontFamily = 'monospace';
+            statusDiv.innerHTML = `
+                <div style="
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    background: #2ecc71;
+                    animation: pulse 2s infinite;
+                "></div>
+                <span>LIVE</span>
+            `;
+            
+            chartContainer.appendChild(svg);
+            chartContainer.appendChild(statusDiv);
+            container.appendChild(chartContainer);
         }
         
         // Initialize graphs with empty data
