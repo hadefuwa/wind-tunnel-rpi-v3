@@ -734,7 +734,7 @@
 
                     <div class="dashboard-right">
                         <div class="card chart-card">
-                            <h3>Velocity Chart</h3>
+                            <h3 id="dashboard-chart-title">Velocity Chart</h3>
                             <div class="chart-container">
                                 <div id="velocityChart" class="plotly-chart"></div>
                             </div>
@@ -1430,14 +1430,32 @@
             
             console.log('[DEBUG] Extracted velocityData:', velocityData);
             
+            // Get current values for dynamic titles
+            const currentVelocity = data.velocity || 0;
+            const currentFlowRate = data.flowRate || 0;
+            const currentDiffPressure = data.diffPressure || 0;
+            const currentFanSpeed = data.fanSpeed || 0;
+            
+            // Create dynamic titles with live values
+            const velocityTitle = `Velocity: ${currentVelocity} m/s`;
+            const flowRateTitle = `Flow Rate: ${currentFlowRate} l/min`;
+            const diffPressureTitle = `Diff Pressure: ${currentDiffPressure} Pa`;
+            const fanSpeedTitle = `Fan Speed: ${currentFanSpeed} RPM`;
+            
+            // Update dashboard chart title
+            const dashboardChartTitle = document.getElementById('dashboard-chart-title');
+            if (dashboardChartTitle) {
+                dashboardChartTitle.textContent = velocityTitle;
+            }
+            
             // Dashboard charts
-            drawSimpleChart('velocityChart', velocityData, 'Velocity (m/s)', '#3498db');
+            drawSimpleChart('velocityChart', velocityData, velocityTitle, '#3498db');
             
             // Graphs tab charts
-            drawSimpleChart('velocityChart2', velocityData, 'Velocity (m/s)', '#3498db');
-            drawSimpleChart('flowRateChart', flowRateData, 'Flow Rate (l/min)', '#2ecc71');
-            drawSimpleChart('pressureChart2', diffPressureData, 'Diff Pressure (Pa)', '#e74c3c');
-            drawSimpleChart('fanPowerChart', fanSpeedData, 'Fan Speed (RPM)', '#f39c12');
+            drawSimpleChart('velocityChart2', velocityData, velocityTitle, '#3498db');
+            drawSimpleChart('flowRateChart', flowRateData, flowRateTitle, '#2ecc71');
+            drawSimpleChart('pressureChart2', diffPressureData, diffPressureTitle, '#e74c3c');
+            drawSimpleChart('fanPowerChart', fanSpeedData, fanSpeedTitle, '#f39c12');
             
             // Apply zoom to charts after drawing
             setTimeout(() => {
