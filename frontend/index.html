@@ -786,8 +786,13 @@
             <!-- Data Log Tab -->
             <div id="data-log" class="tab-content">
                 <div class="card" style="height: 100%;">
-                    <h3>Recent Data Entries</h3>
-                    <div id="data-log-container" class="data-log" style="height: calc(100% - 60px);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3>Recent Data Entries</h3>
+                        <button id="export-datalog-btn" class="btn" style="background: #27ae60;">
+                            <i class="fas fa-download"></i> Export Datalog
+                        </button>
+                    </div>
+                    <div id="data-log-container" class="data-log" style="height: calc(100% - 70px);">
                         <p style="opacity: 0.7; text-align: center; margin-top: 100px;">No data yet...</p>
                     </div>
                 </div>
@@ -1032,7 +1037,6 @@
                 fillcolor: color + '20',
                 name: label,
                 hovertemplate: '<b>%{fullData.name}</b><br>' +
-                              'Time: %{x}<br>' +
                               'Value: %{y}<br>' +
                               '<extra></extra>'
             };
@@ -1052,7 +1056,7 @@
                     color: '#ecf0f1'
                 },
                 xaxis: {
-                    title: 'Time',
+                    title: 'Sample',
                     titlefont: {
                         color: '#bdc3c7'
                     },
@@ -1062,7 +1066,8 @@
                     gridcolor: '#34495e',
                     zerolinecolor: '#34495e',
                     showgrid: true,
-                    zeroline: false
+                    zeroline: false,
+                    showticklabels: false // Hide timestamp labels
                 },
                 yaxis: {
                     title: label,
@@ -1910,49 +1915,59 @@
             }
         }
 
-        // Initialize WebGL when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Application starting...');
+        // Function to export data log as CSV
+        function exportDataLog() {
+            const logEntries = document.querySelectorAll('#data-log-container .data-entry');
             
-            // Initialize zoom controls and load saved settings
-            loadZoomSetting();
-            initZoomControls();
+            if (logEntries.length === 0) {
+                alert('No data available to export.');
+                return;
+            }
             
-            // Initialize charts with sample data
-            initializeCharts();
+            let csvContent = "data:text/csv;charset=utf-8,";
             
-            // Apply zoom after charts are initialized
-            setTimeout(() => {
-                applyChartZoom();
-            }, 500);
+            // Add CSV header
+            csvContent += "Timestamp,Velocity (m/s),Flow Rate (l/min),Differential Pressure (Pa),Static Pressure (Pa),Fan Speed (RPM),Power (W),Valve Position (%),Drag Force (N)\n";
             
-            // Initialize WebGL visualization
-            setTimeout(initWebGL, 100);
-            
-            // Test connection to backend
-            testConnection();
-            
-            // Auto-start for demo
-            setTimeout(() => {
-                startCollection();
-                console.log('Auto-started data collection');
-            }, 3000);
-            
-            // Regular data updates
-            setInterval(fetchLatestData, 1000);
-            
-            // Resize handlers
-            window.addEventListener('resize', function() {
-                setTimeout(() => {
-                    resizeWebGL();
-                    if (dataBuffer.length > 0) {
-                        const lastData = dataBuffer[dataBuffer.length - 1];
-                        updateCharts(lastData);
-                    }
-                    // Reapply zoom after resize
-                    applyChartZoom();
-                }, 100);
+            // Add each entry
+            logEntries.forEach(entry => {
+                const timestamp = entry.querySelector('.data-timestamp').textContent;
+                
+                // Parse the values from the data entry
+                const valuesText = entry.querySelector('.data-values').textContent;
+                
+                // Extract values using regex
+                const velocity = valuesText.match(/V: ([\d.]+)/)?.[1] || '';
+                const flowRate = valuesText.match(/FR: ([\d.]+)/)?.[1] || '';
+                const diffPressure = valuesText.match(/DP: ([\d.]+)/)?.[1] || '';
+                const staticPressure = valuesText.match(/SP: ([\d.]+)/)?.[1] || '';
+                const fanSpeed = valuesText.match(/Fan: ([\d.]+)/)?.[1] || '';
+                const power = valuesText.match(/Power: ([\d.]+)/)?.[1] || '';
+                const valvePosition = valuesText.match(/Valve: ([\d.]+)/)?.[1] || '';
+                const dragForce = valuesText.match(/Drag: ([\d.]+)/)?.[1] || '';
+                
+                // Add to CSV
+                csvContent += `${timestamp},${velocity},${flowRate},${diffPressure},${staticPressure},${fanSpeed},${power},${valvePosition},${dragForce}\n`;
             });
+            
+            // Create download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `wind_tunnel_data_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.csv`);
+            document.body.appendChild(link);
+            
+            // Trigger download
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Add event listener for export datalog button when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportBtn = document.getElementById('export-datalog-btn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', exportDataLog);
+            }
         });
     </script>
 </body>
